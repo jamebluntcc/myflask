@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="${request.locale_name}">
+  <head>
+    <meta charset="utf-8">
+    <title>Login Page</title>
+  </head>
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+	<link href="{{'bom_maintenance:static/css/bootstrap.css'|static_url}}" rel="stylesheet">
+  <link href="{{'bom_maintenance:static/css/main.css'|static_url}}" rel="stylesheet">
+	<script src="{{'bom_maintenance:static/js/jquery-1.11.1.min.js'|static_url}}"></script>
+  <script src="{{'bom_maintenance:static/js/bootstrap.js'|static_url}}"></script>
+  <script src="{{'bom_maintenance:static/js/jquery.cookie.js'|static_url}}"></script>
+  </head>
+  <body>
+    <div class="container">
+        <section class="loginBox row-fluid">
+            <h2>Login Page</h2>
+            <table>
+              <tr><td>User Name: </td><td><input type="text" id="username" /></td></tr>
+              <tr><td>Password: </td><td><input type="password" id="password" /></td></tr>
+            </table>
+            <section class="row-fluid">
+              <section class="span8 lh30"><label><input type="checkbox" name="rememberme" id="rememberme"/>Remember user</label></section>
+              <section class="span1"><input type="button" value="Login" class="btn btn-primary"></section>
+            </section>
+        </section><!-- /loginBox -->
+    </div> <!-- /container -->
+  </body>
+</html>
+
+<script>
+$(".loginBox .btn").click(function(){
+  login_in();
+})
+
+$(window).keydown(function(event) {
+  if (event.keyCode == '13'){
+    login_in();
+  }
+});
+
+$(document).ready(function(){
+  $("#username").focus();
+  if($.cookie("rmbUser") == "true") {
+    $("#rememberme").prop("checked", true);
+    $("#username").val($.cookie("username"));
+    $("#password").val($.cookie("password"));
+  }
+})
+
+function login_in(){
+  var username = $("#username").val()
+  var password = $("#password").val()
+
+  if($("#rememberme").prop('checked')) {
+    $.cookie("rmbUser", "true", {expires: 7});
+    $.cookie("username", username, {expires: 7});
+    $.cookie("password", password, {expires: 7});
+  } else {
+    $.cookie("rmbUser", "false", {expires: -1});
+    $.cookie("username", "", {expires: -1});
+    $.cookie("password", "", {expires: -1});
+  }
+
+  ajaxSend('/check_login', {"username":username, "password":password}, function(data){
+    if (data == 'Login Success') {
+      window.location.href='/';
+    } else {
+      alert(data);
+    }
+  });
+}
+
+function ajaxSend(reqUest_url, post_data, callback, request_method, return_type, dict_vars) {
+    var params = {
+        url: reqUest_url,
+        data: post_data || '',
+        type: request_method || 'POST',
+        success: callback,
+        error: function (request, textStatus, errorThrown) {
+            alert("Request failed, please try again.")
+            stop_loading('loading')
+        },
+        return_type: return_type || 'json',
+        cache: false,
+        global: true,
+        ajax_func_flag: false,
+        custom_func: callback
+    };
+    if (dict_vars) {
+        for (var key in dict_vars) {
+            params[key] = dict_vars[key];
+        }
+    }
+    $.ajax(params);
+};
+</script>
