@@ -1,100 +1,80 @@
-<!DOCTYPE html>
-<html lang="${request.locale_name}">
-  <head>
-    <meta charset="utf-8">
-    <title>Login Page</title>
-  </head>
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-	<link href="{{'bom_maintenance:static/css/bootstrap.css'|static_url}}" rel="stylesheet">
-  <link href="{{'bom_maintenance:static/css/main.css'|static_url}}" rel="stylesheet">
-	<script src="{{'bom_maintenance:static/js/jquery-1.11.1.min.js'|static_url}}"></script>
-  <script src="{{'bom_maintenance:static/js/bootstrap.js'|static_url}}"></script>
-  <script src="{{'bom_maintenance:static/js/jquery.cookie.js'|static_url}}"></script>
-  </head>
-  <body>
-    <div class="container">
-        <section class="loginBox row-fluid">
-            <h2>Login Page</h2>
-            <table>
-              <tr><td>User Name: </td><td><input type="text" id="username" /></td></tr>
-              <tr><td>Password: </td><td><input type="password" id="password" /></td></tr>
-            </table>
-            <section class="row-fluid">
-              <section class="span8 lh30"><label><input type="checkbox" name="rememberme" id="rememberme"/>Remember user</label></section>
-              <section class="span1"><input type="button" value="Login" class="btn btn-primary"></section>
-            </section>
-        </section><!-- /loginBox -->
-    </div> <!-- /container -->
-  </body>
-</html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0" />
+<title>登录</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+</head>
+<body>
+<div class="box">
+<div class="login-box">
+<div class="login-title text-center">
+<h1><small>登录</small></h1>
+</div>
+<div class="login-content ">
+<div class="form">
+<form action="#" method="post">
+<div class="form-group">
+    <div class="col-xs-12  ">
+            <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                    <input type="text" id="username" name="username" class="form-control" placeholder="用户名">
+            </div>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-xs-12  ">
+            <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="密码">
+            </div>
+    </div>
+</div>
 
+<div class="form-group form-actions">
+    <div class="col-xs-4">
+        <br>
+        <section><label><input type="checkbox" name="rememberme" id="rememberme"/>记住密码</label></section>
+{#        <button class="btn btn-sm btn-info" onclick="login_in()"><span class="glyphicon glyphicon-off"></span> 登录</button>#}
+        <section class="span1"><input type="button" value="登录" onclick="login_in()" class="btn btn-primary"></section>
+        <p class="text-center remove-margin"><small>忘记密码？</small> <a href="javascript:alert('请联系管理员陈中旭获取密码：18628264390')" ><small>找回</small></a></p>
+        <p class="text-center remove-margin"><small>还没注册?</small> <a href="/register" ><small>注册</small></a></p>
+    </div>
+</div>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</body>
+<script src="/static/js/jquery-2.0.0.min.js"></script>
+<script src="/static/js/jquery.cookie.js"></script>
+<script src="/static/js/main.js"></script>
 <script>
-$(".loginBox .btn").click(function(){
-  login_in();
-})
-
-$(window).keydown(function(event) {
-  if (event.keyCode == '13'){
-    login_in();
-  }
-});
-
-$(document).ready(function(){
-  $("#username").focus();
-  if($.cookie("rmbUser") == "true") {
-    $("#rememberme").prop("checked", true);
-    $("#username").val($.cookie("username"));
-    $("#password").val($.cookie("password"));
-  }
-})
-
 function login_in(){
-  var username = $("#username").val()
-  var password = $("#password").val()
+    var username = $("#username").val();
+    var password = $("#password").val();
 
-  if($("#rememberme").prop('checked')) {
-    $.cookie("rmbUser", "true", {expires: 7});
-    $.cookie("username", username, {expires: 7});
-    $.cookie("password", password, {expires: 7});
-  } else {
-    $.cookie("rmbUser", "false", {expires: -1});
-    $.cookie("username", "", {expires: -1});
-    $.cookie("password", "", {expires: -1});
-  }
-
-  ajaxSend('/check_login', {"username":username, "password":password}, function(data){
-    if (data == 'Login Success') {
-      window.location.href='/';
+    if($("#rememberme").prop('checked')) {
+        $.cookie("rmbUser", "true", {expires: 7});
+        $.cookie("username", username, {expires: 7});
+        $.cookie("password", password, {expires: 7});
     } else {
-      alert(data);
+        $.cookie("rmbUser", "false", {expires: -1});
+        $.cookie("username", "", {expires: -1});
+        $.cookie("password", "", {expires: -1});
     }
-  });
-}
 
-function ajaxSend(reqUest_url, post_data, callback, request_method, return_type, dict_vars) {
-    var params = {
-        url: reqUest_url,
-        data: post_data || '',
-        type: request_method || 'POST',
-        success: callback,
-        error: function (request, textStatus, errorThrown) {
-            alert("Request failed, please try again.")
-            stop_loading('loading')
-        },
-        return_type: return_type || 'json',
-        cache: false,
-        global: true,
-        ajax_func_flag: false,
-        custom_func: callback
-    };
-    if (dict_vars) {
-        for (var key in dict_vars) {
-            params[key] = dict_vars[key];
+    ajaxSend('/check_login', {"username":username, "password":password}, function(data){
+        console.log(data);
+        if (data.errcode == 0) {
+            window.location.href='/';
+        } else {
+            alert(data.msg);
         }
-    }
-    $.ajax(params);
-};
+    });
+}
 </script>
+</html>

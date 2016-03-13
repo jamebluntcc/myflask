@@ -1,30 +1,8 @@
 /**
  * Created by chenjialin on 16-2-15.
  */
+var current_input_row = 0;
 $(document).ready(function(){
-    function ajaxSend(reqUest_url, post_data, callback, request_method, return_type, dict_vars) {
-        var params = {
-        url: reqUest_url,
-        data: post_data || '',
-        type: request_method || 'GET',
-        success: callback,
-        error: function (request, textStatus, errorThrown) {
-            alert("Request failed, please try again.");
-        },
-        return_type: return_type || 'json',
-        cache: false,
-        global: true,
-        ajax_func_flag: false,
-        custom_func: callback
-        };
-        if (dict_vars) {
-            for (var key in dict_vars) {
-                params[key] = dict_vars[key];
-            }
-        }
-        $.ajax(params);
-    }
-
     function get_input_data() {
         var sample_project_master_info = {},
             sample_species_info = {},
@@ -123,4 +101,44 @@ $(document).ready(function(){
         }
       }, 'POST');
     }
+        $("#input_detail_info").jqGrid({
+        datatype: 'local',
+        height: 250,
+        colNames: ['id','样品名称', '生产编号', '浓度（ng/ul）', '体积(ul)', 'OD260/280' ,'制备时间' ,'建库类型','数据量', '质量检测'],
+        colModel: [
+            { name: 'id', index: 'id', hidden: true },
+            { name: 'sample_name', index: 'sample_name', editable: true},
+            { name: 'product_num', index: 'product_num', editable: true},
+            { name: 'concentration', index: 'concentration', editable: true},
+            { name: 'volume', index: 'volume', editable: true},
+            { name: 'od_260_or_280', index: 'od_260_or_280', editable: true},
+            { name: 'pre_time', index: 'pre_time', editable: true},
+            { name: 'database_type', index: 'database_type', editable: true},
+            { name: 'data_quantity', index: 'data_quantity', editable: true},
+            { name: 'quality_inspection', index: 'quality_inspection', editable: true},
+        ],
+        caption: "建库测序样品"
+    });
+
+    $("#add").unbind().bind('click', function(){
+        var ids= $("#input_detail_info").getDataIDs();
+        var new_row_id = ids.length == 0 ? '1' : parseInt(ids[ids.length-1].replace(/[^0-9]/ig,""))+1;
+        var jq_obj = $("#input_detail_info");
+        jq_obj.addRowData(new_row_id, {});
+        jq_obj.editRow(new_row_id);
+        current_input_row = new_row_id;
+    });
+
+    $("#del").unbind().bind('click', function(){
+        if (current_input_row) {
+            $("#input_detail_info").delRowData(current_input_row);
+        }
+        var ids= $("#input_detail_info").getDataIDs();
+        current_input_row = ids.length == 0 ? '1' : parseInt(ids[ids.length-1].replace(/[^0-9]/ig,""));
+    });
+
+    $("#input_detail_info").on('click', "input", function (){
+        current_input_row = this.parentNode.parentNode.id;
+    })
+
 });

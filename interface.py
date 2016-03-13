@@ -59,5 +59,14 @@ def show_all_data():
     return data
 
 
+def get_user_role(username, password):
+    db = DBConn()
+    cmd = "select role from user_info where username='%s' and password='%s'" % (username, password)
+    result = db.execute(cmd, get_all=False)
+    role = result[0] if result else ''
+    return role
+
+
+
 if __name__ == '__main__':
     print show_all_data()

@@ -10,14 +10,6 @@ class DBInterfaceError(Exception):
     pass
 
 
-class IntegrityError(Exception):
-    pass
-
-
-class BriefDuplicateError(Exception):
-    pass
-
-
 class DBConn(object):
     """DB connection class.
 
