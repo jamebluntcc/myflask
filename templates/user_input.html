@@ -1,0 +1,147 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-ui"></script>
+    <link href="/static/css/bootstrap-combined.min.css" rel="stylesheet" media="screen">
+    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+
+</head>
+<style>
+li {float: left; list-style: none}
+</style>
+<body>
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span12">
+			<form>
+				<fieldset>
+					<p class="MsoNormal">
+						<strong><span>建</span></strong>  <strong><span>库</span></strong>  <strong><span>测</span></strong>  <strong><span>序</span></strong>  <strong><span>样</span></strong>  <strong><span>品</span></strong>  <strong><span>信</span></strong>  <strong><span>息</span></strong>  <strong><span>单</span></strong>
+					</p>
+                    <table>
+                        <tr>
+                            <td><label>项目编号：</label><input type="text" id="project_number" class="sample_project_master"/> </td>
+                            <td><label>项目名称：</label><input type="text" id="project_name" class="sample_project_master"/></td>
+                            <td><label>客户单位：</label><input type="text" id="cust_organization" class="sample_project_master"/></td>
+                        </tr>
+                        <tr>
+                            <td><label>客户姓名：</label><input type="text" id="cust_user" class="sample_project_master"/></td>
+                            <td><label>E-mail：</label><input type="text" id="email" class="sample_project_master"/></td>
+                            <td><label>联系电话：</label><input type="text" id="cust_tel" class="sample_project_master"/></td>
+                        </tr>
+                        <tr>
+                            <td><label>销售姓名：</label><input type="text" id="sale_name" class="sample_project_master"/></td>
+                            <td><label>送样日期：</label><input type="text" id="sp_delive_date" class="sample_project_master"/></td>
+                            <td><label>样本数量：</label><input type="text" id="sp_sum" class="sample_project_master"/></td>
+                        </tr>
+                    </table>
+                    <hr />
+                    <ol class="inline">
+                        <li>
+                            <span class="help-block"><b>样品物种:</b></span>
+                            <label class="checkbox"><input type="checkbox" id="lyophillization" class="sample_species"/>冻干粉 </label>
+                            <br>
+                            <span class="help-block">溶于:</span>
+                             <label class="checkbox"><input type="checkbox" id="te_buffer" class="sample_species"/>TE buffer </label>
+                             <label class="checkbox"><input type="checkbox" id="ddh2o" class="sample_species"/>ddH2O </label>
+                             <label class="checkbox"><input type="checkbox" id="depc" class="sample_species"/>DEPC水 </label>
+                             <label class="checkbox"><input type="checkbox" />其他: <input type="text" id="sample_species_other" class="sample_species"/></label>
+                            <hr />
+                        </li>
+                        <li>
+                            <span class="help-block"><b>样品类型:</b></span>
+                            <span class="help-block">DNA样品:</span>
+                            <label class="checkbox"><input type="checkbox" id="genomic_dna" class="sample_type"/>基因组DNA </label>
+                            <label class="checkbox"><input type="checkbox" id="chip_dna" class="sample_type"/>ChIP-DNA  </label>
+                            <label class="checkbox"><input type="checkbox" id="pcr_fragment" class="sample_type"/>PCR片段 </label>
+                            <label class="checkbox"><input type="checkbox" id="free_dna" class="sample_type"/>游离DNA </label>
+                            <label class="checkbox"><input type="checkbox" id="mitochondrial_dna" class="sample_type"/>线粒体DNA </label>
+                            <label class="checkbox"><input type="checkbox" />其他: <input type="text" id="others_dna" class="sample_type"/> </label>
+                            <span class="help-block">RNA样品:</span>
+                            <label class="checkbox"><input type="checkbox" id="total_rna" class="sample_type"/>Total RNA </label>
+                            <label class="checkbox"><input type="checkbox" id="to_ribosomal_rna" class="sample_type"/>去核糖体RNA  </label>
+                            <label class="checkbox"><input type="checkbox" id="small_rna" class="sample_type"/>小RNA  </label>
+                            <label class="checkbox"><input type="checkbox" id="c_dna" class="sample_type"/>cDNA </label>
+                            <label class="checkbox"><input type="checkbox" id="plasma_rna" class="sample_type"/>血浆RNA </label>
+                            <label class="checkbox"><input type="checkbox" />其他: <input type="text" id="other_rna" class="sample_type"/> </label>
+                            <hr />
+                        </li>
+                        <li>
+                            <span class="help-block"><b>DNA样品测序类型</b></span>
+                                <label class="checkbox"><input type="checkbox" id="resequencing" class="dna_sample_sequencing_type"/>重测序 </label>
+                                <label class="checkbox"><input type="checkbox" id="de_novo_sequencing" class="dna_sample_sequencing_type"/>De novo测序 </label>
+                                <label class="checkbox"><input type="checkbox" id="mate_pair" class="dna_sample_sequencing_type"/>Mate pair-2K/5K/8K/10K </label>
+                                <label class="checkbox"><input type="checkbox" id="low_initial_weight_sequencing" class="dna_sample_sequencing_type"/>低起始量重测序 </label>
+                                <label class="checkbox"><input type="checkbox" id="exome" class="dna_sample_sequencing_type"/>外显子组 </label>
+                                <label class="checkbox"><input type="checkbox" id="target_area_capture" class="dna_sample_sequencing_type"/>目标区域捕获 </label>
+                                <label class="checkbox"><input type="checkbox" id="pcr_product_sequencing" class="dna_sample_sequencing_type"/>PCR产物测序(
+                                <label class="checkbox"><input type="checkbox" id="purified" class="dna_sample_sequencing_type"/>已纯化 </label>
+                                <label class="checkbox"><input type="checkbox" id="unpurified" class="dna_sample_sequencing_type"/>未纯化 </label>)
+                                </label>
+                                <label class="checkbox"><input type="checkbox" id="16s_rdna" class="dna_sample_sequencing_type"/>16S rDNA </label>
+                                <label class="checkbox"><input type="checkbox" id="rad" class="dna_sample_sequencing_type"/>RAD </label>
+                                <label class="checkbox"><input type="checkbox" id="metagenome" class="dna_sample_sequencing_type"/>宏基因组 </label>
+                                <label class="checkbox"><input type="checkbox" id="chip_seq" class="dna_sample_sequencing_type"/>ChIP-seq </label>
+                                <label class="checkbox"><input type="checkbox" id="dna_methylation_sequencing" class="dna_sample_sequencing_type"/>全基因组甲基化测序 </label>
+                                <label class="checkbox"><input type="checkbox" id="rrbs" class="dna_sample_sequencing_type"/>RRBS </label>
+                                <label class="checkbox"><input type="checkbox" id="medip_seq" class="dna_sample_sequencing_type"/>MeDIP-seq </label>
+                                <label class="checkbox"><input type="checkbox" id="mitochondrial_dna_sequencing" class="dna_sample_sequencing_type"/>线粒体测序 </label>
+                                <label class="checkbox"><input type="checkbox" />其他: <input type="text" id="dna_sample_sequencing_type_other" class="dna_sample_sequencing_type"/> </label>
+                            <hr />
+                        </li>
+                        <li>
+                            <span class="help-block"><b>RNA样品测序类型</b></span>
+                            <label class="checkbox"><input type="checkbox" id="three_eukaryotic_mrna_seq" class="rna_sample_sequencing_type"/>真核生物mRNA-seq </label>
+                            <label class="checkbox"><input type="checkbox" id="mrna_seq_prokaryotae" class="rna_sample_sequencing_type"/>原核生物mRNA-seq </label>
+                            <label class="checkbox"><input type="checkbox" id="low_initial_amount_of_eukaryotic_mrna_seq" class="rna_sample_sequencing_type"/>真核生物低起始量mRNA-seq </label>
+                            <label class="checkbox"><input type="checkbox" id="strand_specific_transcriptome" class="rna_sample_sequencing_type"/>链特异性转录组 </label>
+                            <label class="checkbox"><input type="checkbox" id="incrna_seq" class="rna_sample_sequencing_type"/>lncRNA-seq </label>
+                            <label class="checkbox"><input type="checkbox" id="c_dna_transcriptome" class="rna_sample_sequencing_type"/>cDNA转录组 </label>
+                            <label class="checkbox"><input type="checkbox" id="cdna_single_cell_transcriptom" class="rna_sample_sequencing_type"/>单细胞cDNA转录组 </label>
+                            <label class="checkbox"><input type="checkbox" id="small_rna_sequencing" class="rna_sample_sequencing_type"/>小RNA测序 </label>
+                            <label class="checkbox"><input type="checkbox" id="plasma_small_rna_equencing" class="rna_sample_sequencing_type"/>血浆小RNA测序 </label>
+                            <label class="checkbox"><input type="checkbox" />其他: <input type="text" id="rna_sample_sequencing_type_other" class="rna_sample_sequencing_type"/>  </label>
+                        </li>
+                    </ol>
+				</fieldset>
+			</form>
+            <span class="help-block"><b>样品详情:</b></span>
+            <ul class="inline">
+            <li>1) 核酸样品提取方法:
+            <label class="checkbox"><input type="checkbox" id="" class=""/>试剂盒 </label>
+            <label class="checkbox"><input type="checkbox" id="" class=""/>CTAB法 </label>
+            <label class="checkbox"><input type="checkbox" id="" class=""/>Trizol法 </label>
+            <label class="checkbox"><input type="checkbox" id="" class=""/>其他 </label>
+            </li>
+            <li>2) 如样品质检不合格，做如下处理:
+            <label class="checkbox"><input type="checkbox" id="" class=""/>由贝瑞处理 </label>
+            <label class="checkbox"><input type="checkbox" id="" class=""/>返还 </label>
+            <label class="checkbox"><input type="checkbox" id="" class=""/>其他 </label>
+            </li>
+            <li>3) 项目完成后的剩余样品做如下处理:
+            <label class="checkbox"><input type="checkbox" id="" class=""/>依据合同规定 </label>
+            <label class="checkbox"><input type="checkbox" id="" class=""/>特殊需求 </label>
+            </li>
+            </ul>
+		</div>
+        <span class="help-block"><b>样品详细信息：（请填写下表，如果您的样品数量较多，建议您填写电子版表格后发送给项目管理）</b></span>
+        <input type="button" id="add" value="增加行"/>
+        <input type="button" id="del" value="删除行"/>
+        <input type="button" id="confirm_tables" value="确认表格数据"/>
+        <table id="input_detail_info"></table>
+	</div>
+    <br>
+    <br>
+    <input type="button" id="submit" value="提交信息单"/>
+</div>
+</body>
+<link href="/static/css/jquery-ui.css" rel="stylesheet">
+    <link href="/static/css/ui.jqgrid.css" rel="stylesheet">
+    <link href="/static/css/main.css" rel="stylesheet">
+    <script src="/static/js/jquery-2.0.0.min.js"></script>
+    <script src="/static/js/jquery-ui.min.js/"></script>
+    <script src="/static/js/jquery.jqGrid.src.js/"></script>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/input.js"></script>
+</html>

@@ -1,0 +1,499 @@
+html, body {
+    font-size: 12px;
+    overflow: auto;
+}
+
+td > a {
+    text-decoration: underline;
+}
+
+.loginBox {
+    width: 420px;
+    height: 230px;
+    padding: 0 20px;
+    border: 1px solid #FFF;
+    color: #000;
+    margin-top: 40px;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 0 15px #222;
+    background: -moz-linear-gradient(top, #FFF, #EFEFEF 8%);
+    background: -webkit-gradient(linear, 0 0, 0 100%, from(#F6F6F6), to(#F4F4F4));
+    font: 11px/1.5em 'Microsoft YaHei';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -210px;
+    margin-top: -115px;
+}
+
+.loginBox h2 {
+    height: 45px;
+    font-size: 20px;
+    font-weight: normal;
+}
+
+.color-orange {
+    color: orange;
+}
+
+s {
+  color: gray;
+}
+
+#detail-table select {
+    width: 100%;
+}
+
+.block-inline {
+    display: inline-block;
+}
+
+.blank0 {
+    height: 0;
+    clear: both;
+    font-size: 0px;
+    overflow: hidden;
+}
+
+.w100 {
+    width: 100%;
+}
+
+.tt-input {
+    border: 1px solid #CCC;
+    border-radius: 3px
+}
+
+.brief-cell {
+    display: inline-block;
+    text-align: right;
+    font-size: 11px;
+    margin-right: 20px;
+}
+
+
+
+.up-button {
+    background: url('/static/image/up.png');
+    border: 0px;
+}
+
+.down-button {
+    background: url('/static/image/down.png');
+    border: 0px;
+}
+
+
+.brief-footer {
+    display: inline-block;
+    font-size: 11px;
+    margin-right: 30px;
+}
+
+.brief-cell label {
+    margin-right: 5px;
+}
+
+.origin_source {
+    float: right;
+    text-decoration: underline;
+    color: #047391;
+}
+
+.window-base {
+    padding: 10px;
+    border: 1px solid black;
+    position: fixed;
+    z-index: 9999;
+    background-color: #FFF;
+}
+
+.blank0 {
+    height: 0;
+    clear: both;
+    font-size: 0px;
+    overflow: hidden;
+}
+
+.blank10 {
+    height: 10px;
+    clear: both;
+    font-size: 0px;
+    overflow: hidden;
+}
+
+.blank20 {
+    height: 20px;
+    clear: both;
+    font-size: 0px;
+    overflow: hidden;
+}
+
+.fl {
+    float: left;
+}
+
+.fr {
+    float: right;
+}
+
+.no-border {
+    border: 0;
+}
+
+.custom-combobox-input.ui-widget.ui-widget-content.ui-state-default.ui-corner-left.ui-autocomplete-input.no-border{
+    border: 0;
+}
+
+div {
+    list-style: outside none none;
+}
+
+div#rMenu ul {
+    background-color: #dfdfdf;
+    cursor: pointer;
+    list-style: outside none none;
+    margin: 1px 0;
+    padding:0 5px;
+}
+
+#loading {
+    background: #222;
+    border: medium none;
+    cursor: default;
+    filter: Alpha(Opacity=60);
+    display: none;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    margin: 0;
+    opacity: 0.6;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    z-index: 998;
+}
+
+.sZoom {
+    -moz-animation: DivZoom 0.5s ease-in-out
+}
+
+@-moz-keyframes DivZoom {
+    0% {
+        -moz-transform: scale(0.01)
+    }
+    60% {
+        -moz-transform: scale(1.05)
+    }
+    80% {
+        -moz-transform: scale(0.95)
+    }
+    100% {
+        -moz-transform: scale(1.00)
+    }
+}
+
+.sZoom {
+    -moz-animation: DivZoom 0.5s ease-in-out
+}
+
+.sZoom {
+    -webkit-animation: DivZoom 0.5s ease-in-out
+}
+
+@-webkit-keyframes DivZoom {
+    0% {
+        -webkit-transform: scale(0.01);
+        opacity: 0.2
+    }
+    60% {
+        -webkit-transform: scale(1.05);
+        opacity: 0.5
+    }
+    80% {
+        -webkit-transform: scale(0.95);
+        opacity: 1
+    }
+    100% {
+        -webkit-transform: scale(1.00);
+        opacity: 1
+    }
+}
+
+.sZoom {
+    -webkit-animation: DivZoom 0.5s ease-in-out
+}
+#changes-brief {
+    padding-left: 100px;
+    background-color: #eee;
+}
+.brief-fieldsets .title {
+    width:100px;
+    text-align: right;
+}
+.brief-fieldsets .content {
+    padding-left: 10px;
+    width: 200px;
+}
+.fieldsets {
+    width: 100%;
+}
+.fieldsets td {
+    padding: 2px;
+}
+.fieldsets .title {
+    text-align: right;
+}
+
+/*.fieldsets td > select,*/
+.fieldsets td > input[type="text"] {
+    box-sizing: content-box;
+    width: 100%;
+}
+
+.toggle-hide-show:hover {
+    background-color: #eee;
+    cursor: default;
+}
+
+.toggle-hide-show span:hover {
+    cursor: default;
+}
+
+.left-side,
+.toggle-hide-show,
+.right-side {
+    top: 0;
+    bottom: 0;
+}
+
+.left-side {
+    position: fixed;
+    width: 25%;
+    left: 0;
+}
+
+.right-side {
+    position: fixed;
+    left: 25%;
+    padding-left: 1em;
+    right: 0;
+}
+
+.open > .left-side {
+    display: none;
+}
+
+.open > .right-side {
+    left: 0;
+    right: 0;
+}
+
+.left-side > .nav-tabs {
+}
+
+.left-side > .upload,
+.left-side > .search {
+    padding: .5em 0;
+}
+
+.left-side > .tab-content {
+    position: absolute;
+    top: 80px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: auto;
+}
+
+.right-side > .toggle-hide-show {
+    width: 1em;
+    position: absolute;
+    left: 0;
+}
+
+.right-side > .toggle-hide-show > span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -.5em 0 0 -.5em;
+}
+
+.right-side > .toggle-hide-show > .glyphicon-chevron-right {
+    display: none;
+}
+
+.open > .right-side > .toggle-hide-show > .glyphicon-chevron-right {
+    display: block;
+}
+
+.open > .right-side > .toggle-hide-show > .glyphicon-chevron-left {
+    display: none;
+}
+
+.right-side > .detail-section > .breadcrumb {
+    padding-right: 0;
+}
+
+.right-side > .detail-section > .breadcrumb > .command-group {
+    float: right;
+    margin-top: -4px;
+}
+
+.right-side > .detail-section > .breadcrumb > .command-group:before {
+    padding: 0;
+    content: "";
+}
+
+.right-side > .detail-section > .breadcrumb > .command-group > button {
+    margin-right: 4px;
+}
+
+.right-side > .detail-section > .detail {
+    position: absolute;
+    top: 200px;
+    left: 1em;
+    right: 0;
+    bottom: 0;
+}
+
+.right-side > .detail-section > .detail > .tab-content {
+    position: absolute;
+    top: 39px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+}
+.right-side > .detail-section > .detail > .nav-tabs > .command-group {
+    float: right;
+    margin-top: 12px;
+}
+
+.brief-info td {
+    width: 25%;
+}
+.brief-info .title {
+    width: 8%;
+    min-width: 60px;
+}
+
+.ui-jqgrid th,
+.ui-jqgrid td {
+    border: 1px solid #DDD;
+}
+.ui-jqgrid table[role="grid"] thead > tr > th[role="columnheader"] {
+    background: #047391;
+    font-weight: bold;
+    color: #FFF;
+}
+.ui-jqgrid table[role="grid"] tbody > tr.ui-state-hover > td {
+    background: none;
+    border: 1px solid #DDD;
+    color: inherit;
+}
+.move_up, .move_down, .del_row, .add_row {
+    height: 15px;
+    margin-right: 2px;
+    margin-left: 2px;
+    border: none;
+}
+.move_up {
+    background: url('/static/image/up.png') no-repeat scroll center center transparent;
+}
+.move_down {
+    background: url('/static/image/down.png') no-repeat scroll center center transparent;
+}
+.del_row {
+    background: url('/static/image/delete.png') no-repeat scroll center center transparent;
+}
+.add_row {
+    background: url('/static/image/add.png') no-repeat scroll center center transparent;
+}
+
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+ .custom-combobox {
+    position: relative;
+    display: inline-block;
+}
+.custom-combobox-toggle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin-left: -1px;
+    padding: 0;
+}
+.custom-combobox-input {
+    margin: 0;
+    padding: 5px 10px;
+}
+#detail-table tr td span .custom-combobox-input, tr td span .custom-combobox-input {
+    background: none;
+    font-weight: normal;
+    color: #333;
+}
+.ui-jqgrid-sortable:hover{
+    cursor: auto;
+}
+#detail-table tr td span a, #batchupdate-content tr td span a {
+    background: none;
+}
+span[name="Type"] input {
+    width: 90%;
+}
+span[name='Vendor'] input {
+    width: 80%;
+}
+span[name="Type"] input+a{
+    width: 15%;
+}
+span[name='Vendor'] input+a{
+    width: 15%;
+}
+span[name='Group'] input{
+    width: 80%;
+}
+span[name='Group'] input+a{
+    width: 15%;
+}
+span[name="Life Cycle"] input {
+    background: none;
+    font-weight: normal;
+    color: #333;
+    width: 80%;
+}
+span[name="Life Cycle"] input+a{
+    width:15%;
+}
+span[name="Life Cycle"] a {
+    background: none;
+}
+#ui-id-1, #ui-id-2 {
+    z-index: 2e9;
+}
+
+.ui-state-default.ui-th-column.ui-th-ltr input {
+    color: black;
+}
+
+.mr20 {
+    margin-right: 20px;
+}
+
+.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-front.ui-dialog-buttons.ui-draggable.ui-resizable{
+    z-index: 22147483647;
+}
+
+.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-icon-only.ui-dialog-titlebar-close {
+    display: none;
+}
+.ui-autocomplete.ui-front.ui-menu.ui-widget.ui-widget-content {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
