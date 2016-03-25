@@ -21,3 +21,11 @@ function ajaxSend(reqUest_url, post_data, callback, request_method, return_type,
     }
     $.ajax(params);
 }
+
+function del_row (row_id) {
+        $("#input_detail_info").saveRow(row_id, '', '/save_row ');
+    }
+
+    function save_row (row_id) {
+        $("#input_detail_info").delRowData(row_id);
+    }

@@ -55,6 +55,8 @@ $(document).ready(function(){
             }
         }
 
+
+
         var all_info = {
             'sample_project_master_info': sample_project_master_info,
             'sample_species_info': sample_species_info,
@@ -66,8 +68,46 @@ $(document).ready(function(){
         return all_info
     }
 
+
+    function check_input_data(input_data) {
+        var error_msg = '';
+        var master_info = input_data['sample_project_master_info'];
+        for (var i in master_info) {
+            if (master_info[i].length == 0) {
+                error_msg = '提交失败， 请输入样品基本信息。';
+            }
+        }
+        return error_msg;
+    }
+
+
     $("#submit").click(function() {
+
+        var status = confirm("确认提交数据？");
+        var table_data = [];
+        if (status) {
+            var table_obj = $("#input_detail_info");
+            var ids = table_obj.getDataIDs();
+            for (var i in ids) {
+                var row_data = table_obj.getRowData(ids[i]);
+                table_data.push(row_data);
+                if (row_data['sample_name'].indexOf('input') != -1) {
+                    alert('请先确认表格数据！');
+                    return;
+                }
+            }
+
+        }
+        else {
+            return;
+        }
         var all_info = get_input_data();
+        var error_msg = check_input_data(all_info);
+        if (error_msg.length > 0) {
+            alert(error_msg);
+            return;
+        }
+
 
         //console.log(all_info);
         //return;
@@ -101,10 +141,12 @@ $(document).ready(function(){
         }
       }, 'POST');
     }
-        $("#input_detail_info").jqGrid({
+
+
+    $("#input_detail_info").jqGrid({
         datatype: 'local',
         height: 250,
-        colNames: ['id','样品名称', '生产编号', '浓度（ng/ul）', '体积(ul)', 'OD260/280' ,'制备时间' ,'建库类型','数据量', '质量检测'],
+        colNames: ['id', '样品名称', '生产编号', '浓度（ng/ul）', '体积(ul)', 'OD260/280' ,'制备时间' ,'建库类型','数据量', '质量检测'],
         colModel: [
             { name: 'id', index: 'id', hidden: true },
             { name: 'sample_name', index: 'sample_name', editable: true},
@@ -139,6 +181,13 @@ $(document).ready(function(){
 
     $("#input_detail_info").on('click', "input", function (){
         current_input_row = this.parentNode.parentNode.id;
-    })
+    });
 
+    $("#confirm_tables").unbind().bind('click', function() {
+        var jq_obj = $("#input_detail_info");
+        var ids= jq_obj.getDataIDs();
+        for (var i in ids) {
+            jq_obj .saveRow(ids[i], '', 'save_row');
+        }
+    });
 });

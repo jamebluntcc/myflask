@@ -42,9 +42,8 @@
 <div class="form-group form-actions">
     <div class="col-xs-4">
         <br>
-        <button type="submit" class="btn btn-sm btn-info"><span class="glyphicon glyphicon-bell"></span>注册 </button>
+        <input type="button" class="btn btn-info" onclick="register_user()"  value="注册"/>
     </div>
-</div>
 </div>
 </form>
 </div>
@@ -52,4 +51,47 @@
 </div>
 </div>
 </body>
+<script src="/static/js/jquery-2.0.0.min.js"></script>
+<script src="/static/js/main.js"></script>
+<script>
+    function register_user() {
+        var username = $("#username").val();
+        var password = $("#password").val();
+        var e_mail = $("#email").val();
+        var tel = $("#tel").val();
+        if (!username) {
+            alert('请输入用户名！');
+            return;
+        }
+        else if (!password) {
+            alert('请输入密码！');
+            return;
+        }
+        else if (!e_mail) {
+            alert('请输入电子邮箱！');
+            return;
+        }
+        else if (!password) {
+            alert('请输入联系号码！');
+            return;
+        }
+        var info = {
+            'username': username,
+            'password': password,
+            'e_mail': e_mail,
+            'tel': tel
+        }
+        ajaxSend('/save_user_info', {"info": JSON.stringify(info)}, function(data){
+            console.log(data)
+            if (data.errcode == 0) {
+                var status = confirm('注册成功！是否登录？');
+                if (status) {
+                    window.location.href='/login';
+                }
+            } else {
+                alert(data.msg);
+            }
+    });
+    }
+</script>
 </html>

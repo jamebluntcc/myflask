@@ -1,3 +1,4 @@
+#coding:utf-8
 from db import DBConn
 
 
@@ -65,6 +66,17 @@ def get_user_role(username, password):
     result = db.execute(cmd, get_all=False)
     role = result[0] if result else ''
     return role
+
+
+def save_user_info(info):
+    db = DBConn()
+    result = db.execute("select id from user_info where username='%s'" % info.get('username'), get_all=False)
+    if not result:
+        db.insert('user_info', info)
+        return {'data': '', 'errcode': 0, 'msg': 'SUCCESS'}
+    else:
+        return {'data': '', 'errcode': 2, 'msg': '注册失败：该用户已经注册，请使用其它名字！'}
+
 
 
 
