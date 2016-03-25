@@ -72,5 +72,9 @@ def show_test_page():
     return render_template('webpage.html')
 
 
+@app.route('/get_compare_page')
+def get_compare_page():
+    return render_template('compare.html')
+
 if __name__ == '__main__':
-    app.run(host='192.168.1.15', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
