@@ -2,10 +2,113 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>建库信息系统</title>
 </head>
 <body>
-    <a href="/input_info"><input type="button" value="输入数据"/></a>
-    <a href="/show_data"><input type="button" value="查询数据"/></a>
+    欢迎登录建库信息系统
+    {% if role=='manager' %}
+    <br >
+    你的角色是管理员，可以查看负责人为你的项目信息。
+    <br >管理员: {{ username }}
+    {% else %}
+    <br >用户名: {{ username }}
+    {% endif %}
+    <br >
+
+    <br >
+    <a href="/input_info"><input type="button" value="新建项目"/></a>
+    <a href="/analysis"><input type="button" value="数据分析" /></a>
+    <table id="show_all"></table>
+    {% if role=='manager' %}
+    <span><b>查看项目分析数据:</b></span><br>
+    <span>选择项目编号:</span>
+    <select id="select_project_number" onchange="show_render()">
+        {% for option in project_num_list %}
+            <option value ="{{ option }}">{{ option }}</option>
+        {% endfor %}
+    </select>
+    {% endif %}
+    <div id="detail" class="detail"></div>
 </body>
+<link href="/static/css/jquery-ui.css" rel="stylesheet">
+<link href="/static/css/ui.jqgrid.css" rel="stylesheet">
+<script src="/static/js/jquery-2.0.0.min.js"></script>
+<script src="/static/js/bootstrap.js/"></script>
+<script src="/static/js/jquery-ui.min.js/"></script>
+<script src="/static/js/jquery.jqGrid.src.js/"></script>
+<script src="/static/js/grid.locale-en.js/"></script>
+<script src="/static/js/jquery.form.js/"></script>
+<script src="/static/js/jquery.cookie.js/"></script>
+<script src="/static/js/jquery.msgBox.v1.js/"></script>
+<script src="/static/js/main.js"></script>
+<script>
+    var role = "{{ role }}";
+    var table_title =  "我申请的项目:（双击行可修改项目）";
+    var status_list = {'等待送样': '等待送样', '样品快递': '样品快递', '样品质检': '样品质检',
+        '建库测序': '建库测序', '数据分析': '数据分析', '报告发送': '报告发送', '项目完成': '项目完成'};
+    if (role == 'manager') {
+        table_title = "我负责的项目:（双击行可修改项目）<input type='button' onclick='change_status()' value='修改项目状态'></input>";
+    }
+    $("#show_all").jqGrid({
+        datatype: 'local',
+        height: 250,
+        colNames: ['项目编号', '项目名称', '客户单位', '客户姓名', 'E-mail' ,'联系电话' ,'销售姓名',
+            '送样日期', '样本数量', '项目负责人', '项目状态', '创建时间', ''],
+        colModel: [
+            { name: 'project_number', index: 'project_number', width: 65, editable:false},
+            { name: 'project_name', index: 'project_name', width: 65, editable:false},
+            { name: 'cust_organization', index: 'cust_organization', width: 65, editable:false},
+            { name: 'cust_user', index: 'cust_user', width: 65, editable:false},
+            { name: 'email', index: 'email', width: 65, editable:false},
+            { name: 'cust_tel', index: 'cust_tel', width: 65, editable:false},
+            { name: 'sale_name', index: 'sale_name', width: 65, editable:false},
+            { name: 'sp_delive_date', index: 'sp_delive_date', width: 65, editable:false},
+            { name: 'sp_sum', index: 'sp_sum', width: 65},
+            { name: 'project_leader', index: 'project_leader', width: 80, editable:false},
+            { name: 'status', index: 'status', width: 80, editable: true, edittype: 'select', editoptions: { value: status_list, maxLength: 20 }},
+            { name: 'create_time', index: 'create_time', width: 120, editable:false},
+            { name: 'save', index: 'save', width: 120, hidden: false}
+        ],
+        ondblClickRow: function(rowid) {
+            var project_number = $("#show_all").getRowData(rowid)['project_number'];
+            window.location.href='/input_info?action=update&project_number=' + project_number;
+
+        },
+{#        multiselect: true,#}
+        caption: table_title
+    });
+
+    ajaxSend('get_all_data', {'role': role}, function(data) {
+        var all_data = data['data'];
+        for (var i=0; i<=all_data.length;i++) {
+            $("#show_all").jqGrid('addRowData', i+1, all_data[i])
+        }
+    });
+
+    function change_status() {
+        var table_obj = $("#show_all");
+        var ids = table_obj.getDataIDs();
+        for (var i in ids) {
+            table_obj.editRow(ids[i]);
+            $("#show_all").setCell(ids[i], 'save', "<input type='button' onclick='save_row("+ ids[i] +")' value='保存状态'></input>");
+        }
+    }
+
+    function save_row(row_id) {
+        $("#show_all").setCell(row_id, 'save', '');
+        var project_number = $("#show_all").getCell(row_id, 'project_number');
+        $("#show_all").saveRow(row_id, 'status', '/save_status', {'project_number': project_number});
+    }
+
+    function show_render() {
+        var project_number = $("#select_project_number").val();
+        if (project_number.length == 0) {
+             $("#detail").empty();
+        }
+        else {
+             $("#detail").render("analysis?project_number=" + project_number);
+        }
+    }
+
+</script>
 </html>

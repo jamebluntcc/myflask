@@ -1,4 +1,40 @@
 // document on ready
+function init() {
+    /**
+     * [render template]
+     * @param  {[type]} url URL
+     */
+
+    jQuery.fn.extend({
+        render: function (url) {
+            $(this).load(url, function (result) {
+                $(".z").hide();
+            });
+        },
+        /**
+         * centerWindow
+         */
+        centerWindow: function () {
+            var width = $(window).width(),
+                height = $(window).height(),
+                left = width - $(this).width() > 0 ? (width - $(this).width()) / 2 : 0,
+                top = height - $(this).height() > 0 ? (height - $(this).height()) / 2 : 0;
+            $(this).css({
+                left: left,
+                top: top
+            });
+            $(".z").show();
+            $(this).removeClass("sZoom").addClass("sZoom").show();
+        }
+    });
+    jQuery.extend({
+        hideWindow: function () {
+            $(".window-base").hide();
+            $(".z").hide();
+        }
+    });
+}
+
 function ajaxSend(reqUest_url, post_data, callback, request_method, return_type, dict_vars) {
     var params = {
     url: reqUest_url,
@@ -29,3 +65,5 @@ function del_row (row_id) {
     function save_row (row_id) {
         $("#input_detail_info").delRowData(row_id);
     }
+
+init();

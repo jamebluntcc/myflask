@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>样品差异比较</title>
+</head>
+<script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
+<script src="/static/js/main.js"></script>
+<body>
+    <span>物种信息：</span>
+    <select id="species_information" onchange="species_info_Change()">
+        <option value ="物种1" {% if data.species_information=='物种1' %} selected {% endif %}>物种1</option>
+        <option value ="物种2" {% if data.species_information=='物种2' %} selected {% endif %}>物种2</option>
+        <option value ="Other" {% if data.species_information!='物种1' and data.species_information!='物种2' %} selected {% endif %}>Other</option>
+    </select>
+    <input id="species_other" {% if data.species_information=='物种1' or data.species_information=='物种2' %} hidden="" {% endif %} value="{{ data.species_information  }}"/>
+    <br >
+    <span>参考基因组：</span>
+    <label class="checkbox"><input type="checkbox" id="refer_ensemble" class="refer" {% if data.refer_ensemble=='Y' %} checked {% endif %}/>Ensemble</label>
+    <label class="checkbox"><input type="checkbox" id="refer_ncbi" class="refer" {% if data.refer_ncbi=='Y' %} checked {% endif %}/>NCBI</label>
+    <label class="checkbox"><input type="checkbox" id="refer_ucsc" class="refer" {% if data.refer_ucsc=='Y' %} checked {% endif %}/>UCSC</label>
+    <label class="checkbox"><input type="checkbox" id="refer_null" class="refer" {% if data.refer_null=='Y' %} checked {% endif %}/>无参考基因组</label>
+    <label class="checkbox">客户提供基因组: <input type="text" id="refer_Prov_customer" class="refer" value="{{ data.refer_Prov_customer }}"/></label>
+    <br >
+    <table id="sample_packet_information"></table><br >
+    <span><b>差异比较方案：</b></span><br >
+    <select id="compare_method">
+        <option value ="两两全比较" {% if data.species_information=='两两全比较' %} selected {% endif %}>两两全比较</option>
+        <option value ="指定比较" {% if data.species_information=='指定比较' %} selected {% endif %}>指定比较</option>
+    </select>
+    <table id="compare_table"></table><br >
+    <br>
+    {% if action=='new' %}
+    <input type="button" id="submit_compare" value="提交比较信息"/>
+    {% elif action=='update' %}
+    <input type="button" id="submit_compare" value="更新比较信息"/>
+    {% endif %}
+</body>
+<link href="/static/css/jquery-ui.css" rel="stylesheet">
+<link href="/static/css/ui.jqgrid.css" rel="stylesheet">
+<link href="/static/css/main.css" rel="stylesheet">
+<script src="/static/js/jquery-2.0.0.min.js"></script>
+<script src="/static/js/jquery-ui.min.js/"></script>
+<script src="/static/js/jquery.jqGrid.src.js/"></script>
+<script src="/static/js/main.js"></script>
+<script>
+    var n_current_input_row = 0;
+    var s_current_input_row = 0;
+    $(document).ready(function(){
+        function get_analysis_table_data() {
+            if ("{{ action }}" == 'update') {
+                ajaxSend('get_analysis_table_data', {}, function(data) {
+                    if (data.errcode !=0) {
+                        alert(data.msg);
+                    }
+                    else {
+                        var ret_data = data.data;
+                        var sample_packet_information = ret_data['sample_packet_information'];
+                        var compare_table = ret_data['compare_table'];
+                        var table_obj = $("#sample_packet_information");
+                        for (var i in sample_packet_information) {
+                            table_obj.addRowData(i+1, sample_packet_information[i]);
+                            table_obj.editRow(i+1)
+                        }
+                        table_obj = $("#compare_table");
+                        for (var i in compare_table) {
+                            table_obj.addRowData(i+1, compare_table[i]);
+                            table_obj.editRow(i+1)
+                        }
+                    }
+                });
+            }
+        }
+
+        $("#sample_packet_information").jqGrid({
+            datatype: 'local',
+            height: 250,
+            colNames: ['id', '样品分组', '实验重复', '样品名称'],
+            colModel: [
+                { name: 'id', index: 'id', hidden: true },
+                { name: 'sample_group', index: 'sample_group', editable: true, width: 95},
+                { name: 'repeated_experiment', index: 'repeated_experiment', editable: true},
+                { name: 'sample_name', index: 'sample_name', editable: true},
+            ],
+            gridComplete: function() {},
+            caption: "输入样品分组信息<input type='button' class='add' value='增加行'/><input type='button' class='del' value='删除行'/><input type='button' class='confirm_tables' value='确认表格数据'/>"
+        });
+
+        $("#compare_table").jqGrid({
+            datatype: 'local',
+            height: 250,
+            colNames: ['id', '编号', '比较名称', '样品', '样品'],
+            colModel: [
+                { name: 'id', index: 'id', hidden: true },
+                { name: 'number', index: 'number', editable: true, width: 95},
+                { name: 'comparison_name', index: 'comparison_name', editable: true},
+                { name: 'sample1', index: 'sample1', editable: true},
+                { name: 'sample2', index: 'sample2', editable: true},
+            ],
+            gridComplete: function() {},
+            caption: "差异比较<input type='button' class='add' value='增加行'/><input type='button' class='del' value='删除行'/><input type='button' class='confirm_tables' value='确认表格数据'/>"
+        });
+
+        $(".add").unbind().bind('click', function(){
+            var table_name = this.parentNode.parentNode.parentNode.id.replace('gview_', '');
+            var table_obj = $("#" + table_name);
+            var ids= table_obj.getDataIDs();
+            var new_row_id = ids.length == 0 ? '1' : parseInt(ids[ids.length-1].replace(/[^0-9]/ig,""))+1;
+            table_obj.addRowData(new_row_id, {});
+            table_obj.editRow(new_row_id);
+            if (table_name == 'sample_packet_information') {
+                n_current_input_row = new_row_id;
+            }
+            else if (table_name == 'compare_table') {
+                s_current_input_row = new_row_id;
+            }
+
+        });
+
+        $(".del").unbind().bind('click', function(){
+            var table_name = this.parentNode.parentNode.parentNode.id.replace('gview_', '');
+            var table_obj = $("#" + table_name);
+            if (table_name == 'sample_packet_information' && n_current_input_row) {
+                table_obj.delRowData(n_current_input_row);
+            }
+            else if (table_name == 'compare_table' && s_current_input_row) {
+                table_obj.delRowData(s_current_input_row);
+            }
+            var ids= table_obj.getDataIDs();
+            if (table_name == 'sample_packet_information') {
+                n_current_input_row = ids.length == 0 ? '1' : parseInt(ids[ids.length-1].replace(/[^0-9]/ig,""));
+            }
+            else if (table_name == 'compare_table') {
+                s_current_input_row = ids.length == 0 ? '1' : parseInt(ids[ids.length-1].replace(/[^0-9]/ig,""));
+            }
+
+        });
+
+        $("#sample_packet_information").on('click', "input", function (){
+            n_current_input_row = this.parentNode.parentNode.id;
+        });
+
+        $("#compare_table").on('click', "input", function (){
+            s_current_input_row = this.parentNode.parentNode.id;
+        });
+
+        $(".confirm_tables").unbind().bind('click', function() {
+            var table_name = this.parentNode.parentNode.parentNode.id.replace('gview_', '');
+            var table_obj = $("#" + table_name);
+            var ids= table_obj.getDataIDs();
+            for (var i in ids) {
+                table_obj .saveRow(ids[i], '', 'save_row');
+            }
+        });
+
+        $("#submit_compare").click(function() {
+            var all_info = {};
+            var status = confirm("确认提交数据？");
+            var n_table_data = [];
+            var s_table_data = [];
+            if (status) {
+                var table_obj = $("#sample_packet_information");
+                var ids = table_obj.getDataIDs();
+                for (var i in ids) {
+                    var row_data = table_obj.getRowData(ids[i]);
+                    n_table_data.push(row_data);
+                    if (row_data['sample_group'].indexOf('input') != -1) {
+                        alert('请先确认表格数据！');
+                        return;
+                    }
+                }
+                table_obj = $("#compare_table");
+                ids = table_obj.getDataIDs();
+                for (var i in ids) {
+                    var row_data = table_obj.getRowData(ids[i]);
+                    s_table_data.push(row_data);
+                    if (row_data['number'].indexOf('input') != -1) {
+                        alert('请先确认表格数据！');
+                        return;
+                    }
+                }
+
+            }
+            else {
+                return;
+            }
+            var species_information = $("#species_information").val();
+            if (species_information == 'Other') {
+                species_information = $("#species_other").val();
+            }
+            all_info['species_information'] = species_information;
+            if ($("#refer_ensemble")[0].checked == true) {
+                all_info['refer_ensemble'] = 'Y';
+            }
+            if ($("#refer_ncbi")[0].checked == true) {
+                all_info['refer_ncbi'] = 'Y';
+            }
+            if ($("#refer_ucsc")[0].checked == true) {
+                all_info['refer_ucsc'] = 'Y';
+            }
+            if ($("#refer_null")[0].checked == true) {
+                all_info['refer_null'] = 'Y';
+            }
+            all_info['refer_Prov_customer'] = $("#refer_Prov_customer").val();
+            all_info['compare_method'] = $("#compare_method").val();
+            all_info['sample_packet_information'] = n_table_data;
+            all_info['compare_table'] = s_table_data;
+            all_info = JSON.stringify(all_info);
+            ajaxSend('save_compare_input', {'all_info': all_info}, function(data) {
+                if (data.errcode !=0) {
+                    alert(data.msg);
+                }
+                else {
+                    alert(data.msg);
+                    window.location.href='/';
+                }
+            });
+        });
+
+
+
+
+
+
+        get_analysis_table_data();
+    });
+    function species_info_Change() {
+        if ($("#species_information")[0].value == 'Other') {
+            $("#species_other").show();
+        }
+        else {
+            $("#species_other").hide();
+        }
+    }
+
+    function genome_Change() {
+        if ($("#reference_genome")[0].value == '客户提供基因组') {
+            $("#reference_other").show();
+        }
+        else {
+            $("#reference_other").hide();
+        }
+    }
+
+
+</script>
+</html>

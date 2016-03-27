@@ -8,12 +8,14 @@ $(document).ready(function(){
             sample_species_info = {},
             sample_type_info = {},
             dna_sample_sequencing_type_info = {},
-            rna_sample_sequencing_type_info = {};
+            rna_sample_sequencing_type_info = {},
+            sample_other_info = {};
         var sample_project_master = $(".sample_project_master");
         var sample_species = $(".sample_species");
         var sample_type = $(".sample_type");
         var dna_sample_sequencing_type = $(".dna_sample_sequencing_type");
         var rna_sample_sequencing_type = $(".rna_sample_sequencing_type");
+        var sample_other = $(".sample_other");
 
         for (var i=0;i<sample_project_master.length;i++) {
             sample_project_master_info[sample_project_master[i].id] = sample_project_master[i].value;
@@ -55,6 +57,15 @@ $(document).ready(function(){
             }
         }
 
+         for (var i=0;i<sample_other.length;i++) {
+            if (sample_other[i].type == 'checkbox') {
+                sample_other_info[sample_other[i].id] = sample_other[i].checked? 'Y': 'N';
+            }
+            else {
+                sample_other_info[sample_other[i].id] = sample_other[i].value;
+            }
+        }
+
 
 
         var all_info = {
@@ -62,7 +73,9 @@ $(document).ready(function(){
             'sample_species_info': sample_species_info,
             'sample_type_info': sample_type_info,
             'dna_sample_sequencing_type_info': dna_sample_sequencing_type_info,
-            'rna_sample_sequencing_type_info': rna_sample_sequencing_type_info
+            'rna_sample_sequencing_type_info': rna_sample_sequencing_type_info,
+            'sample_other_info': sample_other_info
+
         };
 
         return all_info
@@ -107,18 +120,15 @@ $(document).ready(function(){
             alert(error_msg);
             return;
         }
-
-
-        //console.log(all_info);
-        //return;
-
+        all_info['table_data'] = table_data;
         all_info = JSON.stringify(all_info);
-        ajaxSend('save_input', {'all_info': all_info}, function(data) {
+        ajaxSend('save_input', {'all_info': all_info, 'action': action}, function(data) {
             if (data.errcode !=0) {
                 alert(data.msg);
             }
             else {
-                alert('Save success!');
+                alert(data.msg);
+                window.location.href='/';
             }
         });
     });
@@ -127,11 +137,6 @@ $(document).ready(function(){
       save();
     });
 
-    //$win.keydown(function(event) {
-    //  if (event.keyCode == '13'){
-    //    save();
-    //  }
-    //});
     function save(){
       ajaxSend('/check_login?m='+(new Date()).getTime(), {"username":username, "password":password}, function(data){
         if (data.data == 'Login Success') {
@@ -143,13 +148,33 @@ $(document).ready(function(){
     }
 
 
+    function input_row_data() {
+        if (action == 'update') {
+                ajaxSend('get_detail_sample_data', {'project_number': project_number}, function(data) {
+                    if (data.errcode !=0) {
+                        alert(data.msg);
+                    }
+                    else {
+                        var row_data = data.data;
+                        var table_obj = $("#input_detail_info");
+                        for (var i in row_data) {
+                            table_obj.addRowData(i+1, data.data[i]);
+                            table_obj.editRow(i+1)
+                        }
+
+                    }
+                });
+            }
+    }
+
+
     $("#input_detail_info").jqGrid({
         datatype: 'local',
         height: 250,
         colNames: ['id', '样品名称', '生产编号', '浓度（ng/ul）', '体积(ul)', 'OD260/280' ,'制备时间' ,'建库类型','数据量', '质量检测'],
         colModel: [
             { name: 'id', index: 'id', hidden: true },
-            { name: 'sample_name', index: 'sample_name', editable: true},
+            { name: 'sample_name', index: 'sample_name', editable: true, width: 95},
             { name: 'product_num', index: 'product_num', editable: true},
             { name: 'concentration', index: 'concentration', editable: true},
             { name: 'volume', index: 'volume', editable: true},
@@ -159,10 +184,11 @@ $(document).ready(function(){
             { name: 'data_quantity', index: 'data_quantity', editable: true},
             { name: 'quality_inspection', index: 'quality_inspection', editable: true},
         ],
+        gridComplete: function() {},
         caption: "建库测序样品"
     });
 
-    $("#add").unbind().bind('click', function(){
+    $(".add").unbind().bind('click', function(){
         var ids= $("#input_detail_info").getDataIDs();
         var new_row_id = ids.length == 0 ? '1' : parseInt(ids[ids.length-1].replace(/[^0-9]/ig,""))+1;
         var jq_obj = $("#input_detail_info");
@@ -171,7 +197,7 @@ $(document).ready(function(){
         current_input_row = new_row_id;
     });
 
-    $("#del").unbind().bind('click', function(){
+    $(".del").unbind().bind('click', function(){
         if (current_input_row) {
             $("#input_detail_info").delRowData(current_input_row);
         }
@@ -183,11 +209,13 @@ $(document).ready(function(){
         current_input_row = this.parentNode.parentNode.id;
     });
 
-    $("#confirm_tables").unbind().bind('click', function() {
+    $(".confirm_tables").unbind().bind('click', function() {
         var jq_obj = $("#input_detail_info");
         var ids= jq_obj.getDataIDs();
         for (var i in ids) {
             jq_obj .saveRow(ids[i], '', 'save_row');
         }
     });
+
+    input_row_data();
 });
