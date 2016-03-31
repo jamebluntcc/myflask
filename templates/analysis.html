@@ -7,13 +7,6 @@
 <script type="text/javascript" src="/static/js/jquery-2.0.0.min.js"></script>
 <script src="/static/js/main.js"></script>
 <body>
-    <span>物种信息：</span>
-    <select id="species_information" onchange="species_info_Change()">
-        <option value ="物种1" {% if data.species_information=='物种1' %} selected {% endif %}>物种1</option>
-        <option value ="物种2" {% if data.species_information=='物种2' %} selected {% endif %}>物种2</option>
-        <option value ="Other" {% if data.species_information!='物种1' and data.species_information!='物种2' %} selected {% endif %}>Other</option>
-    </select>
-    <input id="species_other" {% if data.species_information=='物种1' or data.species_information=='物种2' %} hidden="" {% endif %} value="{{ data.species_information  }}"/>
     <br >
     <span>参考基因组：</span>
     <label class="checkbox"><input type="checkbox" id="refer_ensemble" class="refer" {% if data.refer_ensemble=='Y' %} checked {% endif %}/>Ensemble</label>
@@ -25,8 +18,8 @@
     <table id="sample_packet_information"></table><br >
     <span><b>差异比较方案：</b></span><br >
     <select id="compare_method">
-        <option value ="两两全比较" {% if data.species_information=='两两全比较' %} selected {% endif %}>两两全比较</option>
-        <option value ="指定比较" {% if data.species_information=='指定比较' %} selected {% endif %}>指定比较</option>
+        <option value ="两两全比较" {% if data.compare_method=='两两全比较' %} selected {% endif %}>两两全比较</option>
+        <option value ="指定比较" {% if data.compare_method=='指定比较' %} selected {% endif %}>指定比较</option>
     </select>
     <table id="compare_table"></table><br >
     <br>
@@ -46,10 +39,11 @@
 <script>
     var n_current_input_row = 0;
     var s_current_input_row = 0;
+    var selected_project = '{{ selected_project }}';
     $(document).ready(function(){
         function get_analysis_table_data() {
             if ("{{ action }}" == 'update') {
-                ajaxSend('get_analysis_table_data', {}, function(data) {
+                ajaxSend('get_analysis_table_data', {'selected_project': selected_project}, function(data) {
                     if (data.errcode !=0) {
                         alert(data.msg);
                     }
@@ -59,11 +53,13 @@
                         var compare_table = ret_data['compare_table'];
                         var table_obj = $("#sample_packet_information");
                         for (var i in sample_packet_information) {
+                            i = parseInt(i);
                             table_obj.addRowData(i+1, sample_packet_information[i]);
                             table_obj.editRow(i+1)
                         }
                         table_obj = $("#compare_table");
                         for (var i in compare_table) {
+                            i = parseInt(i);
                             table_obj.addRowData(i+1, compare_table[i]);
                             table_obj.editRow(i+1)
                         }
@@ -78,7 +74,7 @@
             colNames: ['id', '样品分组', '实验重复', '样品名称'],
             colModel: [
                 { name: 'id', index: 'id', hidden: true },
-                { name: 'sample_group', index: 'sample_group', editable: true, width: 95},
+                { name: 'sample_group', index: 'sample_group', editable: true},
                 { name: 'repeated_experiment', index: 'repeated_experiment', editable: true},
                 { name: 'sample_name', index: 'sample_name', editable: true},
             ],
@@ -92,7 +88,7 @@
             colNames: ['id', '编号', '比较名称', '样品', '样品'],
             colModel: [
                 { name: 'id', index: 'id', hidden: true },
-                { name: 'number', index: 'number', editable: true, width: 95},
+                { name: 'number', index: 'number', editable: true},
                 { name: 'comparison_name', index: 'comparison_name', editable: true},
                 { name: 'sample1', index: 'sample1', editable: true},
                 { name: 'sample2', index: 'sample2', editable: true},
@@ -148,8 +144,36 @@
             var table_name = this.parentNode.parentNode.parentNode.id.replace('gview_', '');
             var table_obj = $("#" + table_name);
             var ids= table_obj.getDataIDs();
+            var group_list = [];
             for (var i in ids) {
-                table_obj .saveRow(ids[i], '', 'save_row');
+                table_obj.saveRow(ids[i], '', 'save_row');
+                if (table_name == 'sample_packet_information') {
+                    var sample_group = table_obj.getCell(ids[i], 'sample_group');
+                    if (group_list.indexOf(sample_group) == -1) {
+                        group_list.push(sample_group);
+                    }
+                }
+            }
+            if (table_name == 'sample_packet_information') {
+                var status = confirm("是否自动生成比较名称？");
+                if(!status) {
+                    return;
+                }
+                $("#compare_table").clearGridData();
+                var row_id = 1;
+                if (group_list.length>1) {
+                    var len = group_list.length;
+                    $("#compare_table").clearGridData();
+                    for (var i=0;i<len;i++) {
+                        for (var j=i+1;j<len;j++) {
+                            table_obj.addRowData(i+1, compare_table[i]);
+                            $("#compare_table").addRowData(row_id, {'number': row_id, 'comparison_name': group_list[i]+' vs '+group_list[j]});
+                            $("#compare_table").editRow(row_id);
+                            row_id++;
+                        }
+                    }
+                }
+                s_current_input_row = row_id -1;
             }
         });
 
@@ -184,11 +208,6 @@
             else {
                 return;
             }
-            var species_information = $("#species_information").val();
-            if (species_information == 'Other') {
-                species_information = $("#species_other").val();
-            }
-            all_info['species_information'] = species_information;
             if ($("#refer_ensemble")[0].checked == true) {
                 all_info['refer_ensemble'] = 'Y';
             }
@@ -201,12 +220,13 @@
             if ($("#refer_null")[0].checked == true) {
                 all_info['refer_null'] = 'Y';
             }
+            all_info['species_information'] = $("#species_information").val();
             all_info['refer_Prov_customer'] = $("#refer_Prov_customer").val();
             all_info['compare_method'] = $("#compare_method").val();
             all_info['sample_packet_information'] = n_table_data;
             all_info['compare_table'] = s_table_data;
             all_info = JSON.stringify(all_info);
-            ajaxSend('save_compare_input', {'all_info': all_info}, function(data) {
+            ajaxSend('save_compare_input', {'all_info': all_info, 'selected_project': selected_project}, function(data) {
                 if (data.errcode !=0) {
                     alert(data.msg);
                 }
@@ -216,12 +236,6 @@
                 }
             });
         });
-
-
-
-
-
-
         get_analysis_table_data();
     });
     function species_info_Change() {

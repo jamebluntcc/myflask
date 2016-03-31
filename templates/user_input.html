@@ -44,8 +44,9 @@ li {float: left; list-style: none}
                         <tr>
                             <td><label>选择项目负责人：</label>
                                 <select id="project_leader" class="sample_project_master">
-                                    <option value ="陈中旭" {% if data.project_leader=='陈中旭' %} selected {% endif %}>陈中旭</option>
-                                    <option value ="陈家林" {% if data.project_leader=='陈家林' %} selected {% endif %}>陈家林</option>
+                                    {% for option in manager_list %}
+                                    <option value ="{{ option }}" {% if data.project_leader==option %} selected {% endif %}>{{ option }}</option>
+                                    {% endfor %}
                                 </select>
                             </td>
                         </tr>
@@ -167,6 +168,7 @@ li {float: left; list-style: none}
 <script>
     var action = "{{ action }}";
     var project_number = "{{ data.project_number }}";
+    var role = "{{ role }}";
 </script>
 <script src="/static/js/input.js"></script>
 </html>

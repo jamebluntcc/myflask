@@ -167,14 +167,38 @@ $(document).ready(function(){
             }
     }
 
+    table1_map = {
+    '任单编号': 'any_single_num',
+    '样品编号': 'sample_number',
+    '样品名称': 'sample_name',
+    '文库名称': 'library_name',
+    'Index序号': 'index_num',
+    'Index序列': 'index_sequence',
+    '文库类型': 'library_type',
+    '文库切胶长度': 'length_of_gel',
+    '片段长度(bp)': 'fragment_length',
+    '文库体积(ul)': 'library_volume',
+    '数据量（raw data）': 'data_size'
+}
+
+        table3_map = {
+    'WGCID': 'any_single_num',
+    'Original Sample Name': 'sample_number',
+    'Project ID': 'sample_name',
+    'Yield': 'library_name',
+    'Reads': 'index_num'
+}
+
 
     $("#input_detail_info").jqGrid({
         datatype: 'local',
         height: 250,
-        colNames: ['id', '样品名称', '生产编号', '浓度（ng/ul）', '体积(ul)', 'OD260/280' ,'制备时间' ,'建库类型','数据量', '质量检测'],
+        colNames: ['id', '样品名称', '生产编号', '浓度（ng/ul）', '体积(ul)', 'OD260/280' ,'制备时间' ,'建库类型','数据量', '质量检测',
+        '任单编号', '样品编号', '文库名称', 'Index序号' , 'Index序列', '文库类型', '文库切胶长度', '片段长度(bp)', '文库体积(ul)',
+            ' 数据量（raw data）'],
         colModel: [
             { name: 'id', index: 'id', hidden: true },
-            { name: 'sample_name', index: 'sample_name', editable: true, width: 95},
+            { name: 'sample_name', index: 'sample_name', editable: true},
             { name: 'product_num', index: 'product_num', editable: true},
             { name: 'concentration', index: 'concentration', editable: true},
             { name: 'volume', index: 'volume', editable: true},
@@ -183,6 +207,19 @@ $(document).ready(function(){
             { name: 'database_type', index: 'database_type', editable: true},
             { name: 'data_quantity', index: 'data_quantity', editable: true},
             { name: 'quality_inspection', index: 'quality_inspection', editable: true},
+
+            { name: 'any_single_num', index: 'any_single_num', editable: true},
+            { name: 'sample_number', index: 'sample_number', editable: true},
+            { name: 'library_name', index: 'library_name', editable: true},
+            { name: 'index_num', index: 'index_num', editable: true},
+            { name: 'index_sequence', index: 'index_sequence', editable: true},
+            { name: 'library_type', index: 'library_type', editable: true},
+            { name: 'length_of_gel', index: 'length_of_gel', editable: true},
+            { name: 'fragment_length', index: 'fragment_length', editable: true},
+            { name: 'library_volume', index: 'library_volume', editable: true},
+            { name: 'data_size', index: 'data_size', editable: true},
+
+
         ],
         gridComplete: function() {},
         caption: "建库测序样品"

@@ -16,6 +16,14 @@
 <div class="form">
 <form action="#" method="post">
 <div class="input-group">
+    <span class="input-group-addon"><span class="glyphicon glyphicon-apple"></span>注册类型</span>
+    <select id="role" name="role" class="form-control" style="width: 200px">
+        <option value="user">用户</option>
+        <option value="manager">管理员</option>
+    </select>
+</div>
+    <br>
+<div class="input-group">
     <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
     <input type="text" id="username" name="username" class="form-control" placeholder="用户名" style="width: 500px">
 </div>
@@ -75,11 +83,13 @@
             alert('请输入联系号码！');
             return;
         }
+        var role =$("#role").val();
         var info = {
             'username': username,
             'password': password,
             'e_mail': e_mail,
-            'tel': tel
+            'tel': tel,
+            'role': role
         }
         ajaxSend('/save_user_info', {"info": JSON.stringify(info)}, function(data){
             console.log(data)

@@ -1,7 +1,21 @@
 #coding=utf-8
 import datetime
+import os
 from db import DBConn
 
+table1_map = {
+    '任单编号': 'any_single_num',
+    '样品编号': 'sample_number',
+    '样品名称': 'sample_name',
+    '文库名称': 'library_name',
+    'Index序号': 'index_num',
+    'Index序列': 'index_sequence',
+    '文库类型': 'library_type',
+    '文库切胶长度': 'length_of_gel',
+    '片段长度(bp)': 'fragment_length',
+    '文库体积(ul)': 'library_volume',
+    '数据量（raw data）': 'data_size'
+}
 
 def save_info(all_info, username, action='new'):
     db_instance = DBConn()
@@ -27,10 +41,32 @@ def save_info(all_info, username, action='new'):
     return {'data': '', 'errcode': 0, 'msg': msg}
 
 
-def save_compare_input(all_info, username, action='new'):
+def get_project_id_by_num(db_instance, project_number):
+    cmd = "select id from sample_project_master where project_number=%s" % project_number
+    result = db_instance.execute(cmd, get_all=False)
+
+    return result[0]
+
+
+def save_compare_text(selected_project, compare_data):
+    try:
+        file_name = os.path.dirname(__file__) + '/static/export/' + selected_project + '.txt'
+        fd = open(file_name, 'w+')
+        for data in compare_data:
+            fd.write(data['comparison_name'] + '\n')
+
+        fd.close()
+    except Exception, e:
+        print e
+
+
+def save_compare_input(all_info, username, selected_project, action='new'):
     time = datetime.datetime.now()
     db_instance = DBConn()
-    cmd = "select id from analysis_master where created_by='%s'" % username
+    project_number = selected_project.split('-')[-1]
+    project_id = get_project_id_by_num(db_instance, project_number)
+    all_info['project_id'] = project_id
+    cmd = "select id from analysis_master where created_by='%s' and project_id=%s" % (username, project_id)
     result = db_instance.execute(cmd, get_all=False)
     if result:
         action = 'update'
@@ -58,6 +94,8 @@ def save_compare_input(all_info, username, action='new'):
         del row['id']
         row['master_id'] = master_id
         db_instance.insert('compare_table', row)
+
+    save_compare_text(selected_project, compare_table)
 
     msg = '更新成功！' if action == 'update' else '保存成功!'
     return {'data': '', 'errcode': 0, 'msg': msg}
@@ -140,8 +178,12 @@ def get_one_project_data(project_number):
     return data
 
 
-def get_analysis_data(username):
-    cmd = "select * from analysis_master where created_by='%s'" % username
+def get_analysis_data(username, role, selected_project):
+    if not selected_project:
+        return {}
+    project_number = selected_project.split('-')[-1]
+    cmd = """select a.* from analysis_master a,sample_project_master s
+          where a.project_id=s.id and s.project_number=%s""" % project_number
     db = DBConn()
     result = db.execute(cmd, get_all=False)
 
@@ -183,15 +225,17 @@ def get_detail_sample_data(project_number):
     return data
 
 
-def get_analysis_table_data(username):
+def get_analysis_table_data(username, selected_project):
     data = {}
     db = DBConn()
+    project_number = selected_project.split('-')[-1]
+    project_id = get_project_id_by_num(db, project_number)
     cmd = """select info.* from sample_packet_information info, analysis_master m
-                  where m.id=info.master_id and m.created_by='%s'""" % username
+                  where m.id=info.master_id and m.project_id=%s""" % project_id
     results = db.execute(cmd)
     data['sample_packet_information'] = [dict(i) for i in results]
     cmd = """select info.* from compare_table info, analysis_master m
-                  where m.id=info.master_id and m.created_by='%s'""" % username
+                  where m.id=info.master_id and m.project_id=%s""" % project_id
     results = db.execute(cmd)
     data['compare_table'] = [dict(i) for i in results]
 
@@ -205,9 +249,9 @@ def save_status(project_number, status):
 
 def get_project_number_list(username, user_role):
     if user_role == 'manager':
-        cmd = "select project_number from sample_project_master where project_leader='%s'" % username
+        cmd = "select concat(project_name, '-', project_number) from sample_project_master where project_leader='%s'" % username
     elif user_role == 'user':
-        cmd = "select project_number from sample_project_master where created_by='%s'" % username
+        cmd = "select concat(project_name, '-', project_number) from sample_project_master where created_by='%s'" % username
 
     db = DBConn()
     results = db.execute(cmd)
@@ -215,7 +259,14 @@ def get_project_number_list(username, user_role):
     return [i[0] for i in results]
 
 
+def get_manager_list():
+    db = DBConn()
+    cmd = "select username from user_info where role='manager'"
+
+    result = db.execute(cmd)
+
+    return [i[0] for i in result]
+
 
 if __name__ == '__main__':
-    pass
-
+    print get_manager_list()

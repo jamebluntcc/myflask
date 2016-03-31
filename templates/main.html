@@ -16,13 +16,16 @@
     <br >
 
     <br >
+    {% if role=='user' %}
     <a href="/input_info"><input type="button" value="新建项目"/></a>
-    <a href="/analysis"><input type="button" value="数据分析" /></a>
+    <a href="/select_project"><input type="button" value="数据分析" /></a>
     <table id="show_all"></table>
-    {% if role=='manager' %}
+    {% elif role=='manager' %}
+    <a href="/select_project"><input type="button" value="导入" /></a>
+    <table id="show_all"></table>
     <span><b>查看项目分析数据:</b></span><br>
     <span>选择项目编号:</span>
-    <select id="select_project_number" onchange="show_render()">
+    <select id="selected_project" onchange="show_render()">
         {% for option in project_num_list %}
             <option value ="{{ option }}">{{ option }}</option>
         {% endfor %}
@@ -98,16 +101,6 @@
         $("#show_all").setCell(row_id, 'save', '');
         var project_number = $("#show_all").getCell(row_id, 'project_number');
         $("#show_all").saveRow(row_id, 'status', '/save_status', {'project_number': project_number});
-    }
-
-    function show_render() {
-        var project_number = $("#select_project_number").val();
-        if (project_number.length == 0) {
-             $("#detail").empty();
-        }
-        else {
-             $("#detail").render("analysis?project_number=" + project_number);
-        }
     }
 
 </script>

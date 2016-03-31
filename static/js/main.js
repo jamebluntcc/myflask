@@ -67,3 +67,14 @@ function del_row (row_id) {
     }
 
 init();
+
+
+function show_render() {
+        var selected_project = $("#selected_project").val();
+        if (selected_project.length == 0) {
+             $("#detail").empty();
+        }
+        else {
+             $("#detail").render("analysis?selected_project=" + selected_project);
+        }
+    }
