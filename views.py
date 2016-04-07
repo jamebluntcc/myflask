@@ -1,6 +1,7 @@
 #coding=utf-8
 from flask import Flask, render_template, redirect, request, jsonify, session
 from datetime import timedelta
+from werkzeug.utils import secure_filename
 import interface
 import json
 import sys
@@ -168,6 +169,14 @@ def select_project():
     project_list = interface.get_project_number_list(username, user_role)
 
     return render_template('select_project.html', project_list=project_list)
+
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    io_stream = request.files['fileupload']
+    secure_filename(io_stream.filename)
+    ret = interface.upload_excel(io_stream)
+    return jsonify(ret)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

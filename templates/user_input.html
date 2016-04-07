@@ -147,6 +147,15 @@ li {float: left; list-style: none}
         <input type="button" class="add" value="增加行"/>
         <input type="button" class="del" value="删除行"/>
         <input type="button" class="confirm_tables" value="确认表格数据"/>
+        <br>
+        {% if role == 'manager' %}
+        <div class="upload" id="upload-div" title="">
+        <form name="fileForm" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+            <input type="file" id="fileupload" name="fileupload"/>
+            <input type="button" id="ExcelForm" class="block-inline" value="解析Excel" style="display:none" class="fr" title="upload excel"/>
+        </form>
+        </div>
+        {% endif %}
         <table id="input_detail_info"></table>
 	</div>
     <br>
@@ -155,7 +164,11 @@ li {float: left; list-style: none}
     <input type="button" id="submit" value="提交信息单"/>
     {% elif action=='update' %}
     <input type="button" id="submit" value="更新信息单"/>
+        <br><br><br><br><p>项目更新信息：</p>
+        <textarea id="project_log" name="MSG" cols=100 rows=20 readonly class="sample_project_master">{{ data.project_log }}</textarea>
     {% endif %}
+    <br>
+
 </div>
 </body>
 <link href="/static/css/jquery-ui.css" rel="stylesheet">
@@ -165,10 +178,12 @@ li {float: left; list-style: none}
 <script src="/static/js/jquery-ui.min.js/"></script>
 <script src="/static/js/jquery.jqGrid.src.js/"></script>
 <script src="/static/js/main.js"></script>
+<script src="/static/js/jquery.form.js"></script>
 <script>
     var action = "{{ action }}";
     var project_number = "{{ data.project_number }}";
     var role = "{{ role }}";
+    var hide = role == 'manager'? false: true;
 </script>
 <script src="/static/js/input.js"></script>
 </html>

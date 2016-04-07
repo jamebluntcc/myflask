@@ -181,12 +181,23 @@ $(document).ready(function(){
     '数据量（raw data）': 'data_size'
 }
 
-        table3_map = {
-    'WGCID': 'any_single_num',
-    'Original Sample Name': 'sample_number',
-    'Project ID': 'sample_name',
-    'Yield': 'library_name',
-    'Reads': 'index_num'
+    table2_map = {
+        'WGCID': 'wg_cid',
+        'LibID': 'lib_id',
+        'SampleType': 'sample_type',
+        'qRCB': 'q_rcb',
+        'volume': 'volume',
+        'OD': 'od',
+        'RIN': 'rin',
+        'LibSize': 'lib_size',
+        'Quality': 'qty'
+    }
+    table3_map = {
+    'WGCID': 'wg_cid',
+    'Original Sample Name': 'original_sample_name',
+    'Project ID': 'project_id_e',
+    'Yield': 'yield',
+    'Reads': 'reads'
 }
 
 
@@ -195,7 +206,7 @@ $(document).ready(function(){
         height: 250,
         colNames: ['id', '样品名称', '生产编号', '浓度（ng/ul）', '体积(ul)', 'OD260/280' ,'制备时间' ,'建库类型','数据量', '质量检测',
         '任单编号', '样品编号', '文库名称', 'Index序号' , 'Index序列', '文库类型', '文库切胶长度', '片段长度(bp)', '文库体积(ul)',
-            ' 数据量（raw data）'],
+            ' 数据量（raw data）', 'WGCID', 'LibID', 'SampleType' , 'qRCB', 'OD', 'RIN', 'LibSize', 'Quality', 'Original Sample Name', 'Project ID', 'Yield', 'Reads'],
         colModel: [
             { name: 'id', index: 'id', hidden: true },
             { name: 'sample_name', index: 'sample_name', editable: true},
@@ -208,16 +219,32 @@ $(document).ready(function(){
             { name: 'data_quantity', index: 'data_quantity', editable: true},
             { name: 'quality_inspection', index: 'quality_inspection', editable: true},
 
-            { name: 'any_single_num', index: 'any_single_num', editable: true},
-            { name: 'sample_number', index: 'sample_number', editable: true},
-            { name: 'library_name', index: 'library_name', editable: true},
-            { name: 'index_num', index: 'index_num', editable: true},
-            { name: 'index_sequence', index: 'index_sequence', editable: true},
-            { name: 'library_type', index: 'library_type', editable: true},
-            { name: 'length_of_gel', index: 'length_of_gel', editable: true},
-            { name: 'fragment_length', index: 'fragment_length', editable: true},
-            { name: 'library_volume', index: 'library_volume', editable: true},
-            { name: 'data_size', index: 'data_size', editable: true},
+            { name: 'any_single_num', index: 'any_single_num', editable: true, hidden: hide},
+            { name: 'sample_number', index: 'sample_number', editable: true, hidden: hide},
+            { name: 'library_name', index: 'library_name', editable: true, hidden: hide},
+            { name: 'index_num', index: 'index_num', editable: true, hidden: hide},
+            { name: 'index_sequence', index: 'index_sequence', editable: true, hidden: hide},
+            { name: 'library_type', index: 'library_type', editable: true, hidden: hide},
+            { name: 'length_of_gel', index: 'length_of_gel', editable: true, hidden: hide},
+            { name: 'fragment_length', index: 'fragment_length', editable: true, hidden: hide},
+            { name: 'library_volume', index: 'library_volume', editable: true, hidden: hide},
+            { name: 'data_size', index: 'data_size', editable: true, hidden: hide},
+
+            { name: 'wg_cid', index: 'wg_cid', editable: true, hidden: hide},
+            { name: 'lib_id', index: 'lib_id', editable: true, hidden: hide},
+            { name: 'sample_type', index: 'sample_type', editable: true, hidden: hide},
+            { name: 'q_rcb', index: 'q_rcb', editable: true, hidden: hide},
+            { name: 'od', index: 'od', editable: true, hidden: hide},
+            { name: 'rin', index: 'rin', editable: true, hidden: hide},
+            { name: 'lib_size', index: 'lib_size', editable: true, hidden: hide},
+            { name: 'qty', index: 'qty', editable: true, hidden: hide},
+
+
+            { name: 'original_sample_name', index: 'original_sample_name', editable: true, hidden: hide},
+            { name: 'project_id_e', index: 'project_id_e', editable: true, hidden: hide},
+            { name: 'yield', index: 'yield', editable: true, hidden: hide},
+            { name: 'reads', index: 'reads', editable: true, hidden: hide},
+
 
 
         ],
@@ -255,4 +282,73 @@ $(document).ready(function(){
     });
 
     input_row_data();
+
+    // upload file
+    var fileupload = document.getElementById("fileupload"), fileExtRegExp = /(?:\.xl(?:s|sx|tx|sm|sb|am))$/i;
+    if (fileupload) {
+        fileupload.onchange = function () {
+            var filename = fileupload.value.replace(/.*\\/, '');
+            if (!filename) {
+                return;
+            }
+            if (fileExtRegExp.test(filename)) {
+                $("#upload-label").html(filename);
+                $("#ExcelForm").show();
+            } else {
+                $("#upload-label").html("<span style='color:red'>Format Error! Only support .xls, .xlsx.</span>");
+                $("#ExcelForm").hide();
+            }
+        }
+    }
+
+
+
+
+
+    $("#ExcelForm").unbind().bind('click', function() {
+        var options = {
+            url: 'upload',
+            type: 'post',
+            success: function(data) {
+                var jq_obj = $("#input_detail_info");
+                var ids= jq_obj.getDataIDs();
+                var complete_data = data.data;
+                for(var i in ids){
+                    jq_obj.saveRow(ids[i], '', 'save_row');
+                    var sample_name = jq_obj.getCell(ids[i], 'sample_name');
+                    var sample_number = jq_obj.getCell(ids[i], 'sample_number');
+                    var wg_cid = jq_obj.getCell(ids[i], 'wg_cid');
+
+                    for(var key in complete_data) {
+                        var sheet_data = complete_data[key];
+                        for(var j in sheet_data) {
+                            var row_data = sheet_data[j];
+                            if (row_data['sample_name'] == sample_name) {
+                                jq_obj.setRowData(ids[i], row_data);
+                                break;
+                            }
+                            if (row_data['original_sample_name'] == sample_number) {
+                                jq_obj.setRowData(ids[i], row_data);
+                                break;
+                            }
+                            if (row_data['original_sample_name'] == sample_number) {
+                                jq_obj.setRowData(ids[i], row_data);
+                                break;
+                            }
+
+                        }
+                    }
+                    jq_obj.editRow(ids[i]);
+                }
+
+                alert(data.msg);
+
+            },
+            error: function(XmlHttpRequest, textStatus, errorThrown){
+                alert('Internal server error, please try again.');
+            }
+        };
+        $("form[name=fileForm]").ajaxSubmit(options);
+    });
+
 });

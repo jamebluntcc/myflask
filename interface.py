@@ -1,6 +1,8 @@
 #coding=utf-8
 import datetime
 import os
+import xlrd
+
 from db import DBConn
 
 table1_map = {
@@ -48,6 +50,13 @@ def get_project_id_by_num(db_instance, project_number):
     return result[0]
 
 
+def get_project_log_by_num(db_instance, project_number):
+    cmd = "select project_log from sample_project_master where project_number=%s" % project_number
+    result = db_instance.execute(cmd, get_all=False)
+
+    return result[0] or ''
+
+
 def save_compare_text(selected_project, compare_data):
     try:
         file_name = os.path.dirname(__file__) + '/static/export/' + selected_project + '.txt'
@@ -65,6 +74,7 @@ def save_compare_input(all_info, username, selected_project, action='new'):
     db_instance = DBConn()
     project_number = selected_project.split('-')[-1]
     project_id = get_project_id_by_num(db_instance, project_number)
+    project_log = get_project_log_by_num(db_instance, project_number)
     all_info['project_id'] = project_id
     cmd = "select id from analysis_master where created_by='%s' and project_id=%s" % (username, project_id)
     result = db_instance.execute(cmd, get_all=False)
@@ -83,7 +93,11 @@ def save_compare_input(all_info, username, selected_project, action='new'):
         all_info['create_time'] = time
         all_info['created_by'] = username
         master_id = db_instance.insert('analysis_master', all_info)
+        project_log += '\n%s: %s created compare method.\n' % (time, username)
+        db_instance.update('sample_project_master', {'id': project_id}, {'project_log': project_log})
     else:
+        project_log += '\n%s: %s update compare method.\n' % (time, username)
+        db_instance.update('sample_project_master', {'id': project_id}, {'project_log': project_log})
         db_instance.update('analysis_master', {'id': master_id}, all_info)
     for row in sample_packet_information:
         del row['id']
@@ -115,15 +129,18 @@ def save_table_info(db_instance, table_data, project_id, action):
 
 
 def save_sample_project_master_info(db_instance, data_info, username, action):
+    time = datetime.datetime.now()
     if action == 'update':
         cmd = "select id from sample_project_master where project_number=%s" % data_info['project_number']
         result = db_instance.execute(cmd, get_all=False)
-        reject_id = result[0]
-        db_instance.update('sample_project_master', {'id': reject_id}, data_info)
-        return reject_id
+        preject_id = result[0]
+        data_info['project_log'] += "\n%s: %s update this project.\n" % (time, username)
+        db_instance.update('sample_project_master', {'id': preject_id}, data_info)
+        return preject_id
     else:
         data_info['created_by'] = username
         data_info['create_time'] = datetime.datetime.now()
+        data_info['project_log'] = "%s: %s create new project.\n" % (time, username)
         return db_instance.insert('sample_project_master', data_info)
 
 
@@ -268,5 +285,93 @@ def get_manager_list():
     return [i[0] for i in result]
 
 
+def transfer_table_title(table_title):
+    title_map = {
+        '任单编号': 'any_single_num',
+        '样品编号': 'sample_number',
+        '样品名称': 'sample_name',
+        '文库名称': 'library_name',
+        'Index序号': 'index_num',
+        'Index序列': 'index_sequence',
+        '文库类型': 'library_type',
+        '文库切胶长度': 'length_of_gel',
+        '片段长度(bp)': 'fragment_length',
+        '文库体积(ul)': 'library_volume',
+        '数据量（raw data）': 'data_size',
+
+        'WGCID': 'wg_cid',
+        'LibID': 'lib_id',
+        'SampleType': 'sample_type',
+        'qRCB': 'q_rcb',
+        'volume': 'volume',
+        'OD': 'od',
+        'RIN': 'rin',
+        'LibSize': 'lib_size',
+        'Quality': 'qty',
+
+        'Original Sample Name': 'original_sample_name',
+        'Project ID': 'project_id_e',
+        'Yield': 'yield',
+        'Reads': 'reads'
+
+    }
+    for index, title in enumerate(table_title):
+        if '数据量' in title:
+            title = '数据量（raw data）'
+
+        if str(title) in title_map.keys():
+            table_title[index] = title_map[str(title)]
+
+    return table_title
+
+
+def transfer_excel_to_json(file_name):
+    # file_name = os.path.basename(file_name)
+    data = xlrd.open_workbook(file_name)
+    sheets = data.sheet_names()
+    json_data = {}
+    for sheet in sheets:
+        table = data.sheet_by_name(sheet)
+        n_rows = table.nrows
+        n_cols = table.ncols
+        table_data = []
+        table_title = table.row_values(0)
+        table_title = transfer_table_title(table_title)
+        for i in range(1, n_rows):
+            table_data.append(dict(zip(table_title, table.row_values(i))))
+        json_data[sheet] = table_data
+
+    return json_data
+
+
+def upload_excel(io_stream):
+    """
+    Upload file and write it to database
+    :param filename: filename
+    :param io_stream: IO Stream
+    :return: dict information
+    """
+    upload_path = os.path.dirname(__file__) + '/static/import/'
+    file_path = os.path.join(upload_path, 'temp.xls')
+    #juge file whether has exist
+    if os.path.exists(file_path):
+        os.remove(file_path)
+    temp_file_path = file_path + '~'
+    print 'file_path: ', file_path
+    print 'temp_file_path: ', temp_file_path
+    output_file = open(temp_file_path, 'wb')
+    io_stream.seek(0)
+    while True:
+        data = io_stream.read(2 << 16)
+        if not data:
+            break
+        output_file.write(data)
+
+    output_file.flush()
+    output_file.close()
+    os.rename(temp_file_path, file_path)
+    data = transfer_excel_to_json(file_path)
+    return {'data': data, 'errcode': 0, 'msg': '上传成功'}
+
 if __name__ == '__main__':
-    print get_manager_list()
+    print transfer_excel_to_json('/home/chenjialin/下载/Table.1.xls')
