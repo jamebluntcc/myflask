@@ -196,6 +196,7 @@ def get_one_project_data(project_number):
 
 
 def get_analysis_data(username, role, selected_project):
+
     if not selected_project:
         return {}
     project_number = selected_project.split('-')[-1]
@@ -203,7 +204,6 @@ def get_analysis_data(username, role, selected_project):
           where a.project_id=s.id and s.project_number=%s""" % project_number
     db = DBConn()
     result = db.execute(cmd, get_all=False)
-
     return dict(result) if result else {}
 
 
@@ -357,8 +357,6 @@ def upload_excel(io_stream):
     if os.path.exists(file_path):
         os.remove(file_path)
     temp_file_path = file_path + '~'
-    print 'file_path: ', file_path
-    print 'temp_file_path: ', temp_file_path
     output_file = open(temp_file_path, 'wb')
     io_stream.seek(0)
     while True:
@@ -374,4 +372,6 @@ def upload_excel(io_stream):
     return {'data': data, 'errcode': 0, 'msg': '上传成功'}
 
 if __name__ == '__main__':
-    print transfer_excel_to_json('/home/chenjialin/下载/Table.1.xls')
+    # print transfer_excel_to_json('/home/chenjialin/下载/Table.1.xls')
+    info = {u'username': u'test', u'role': u'user', u'password': u'test', u'tel': u'test', u'e_mail': u'test'}
+    print save_user_info(info)

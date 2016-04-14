@@ -20,8 +20,8 @@ def main():
     if not username:
         return redirect('/login')
     user_role = interface.get_user_role(username)
-    project_num_list = interface.get_project_number_list(username, user_role)
-    project_num_list.append('')
+    project_num_list = ['']
+    project_num_list += interface.get_project_number_list(username, user_role)
     return render_template('main.html', username=username, role=user_role, project_num_list=project_num_list)
 
 

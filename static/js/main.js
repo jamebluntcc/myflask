@@ -75,6 +75,6 @@ function show_render() {
              $("#detail").empty();
         }
         else {
-             $("#detail").render("analysis?selected_project=" + selected_project);
+             $("#detail").render("analysis?selected_project=" + encodeURIComponent(selected_project));
         }
     }
