@@ -1,0 +1,3 @@
+a vs b
+a vs c
+b vs c
