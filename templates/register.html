@@ -92,16 +92,8 @@
             'role': role
         }
         ajaxSend('/save_user_info', {"info": JSON.stringify(info)}, function(data){
-            console.log(data)
-            if (data.errcode == 0) {
-                var status = confirm('注册成功！是否登录？');
-                if (status) {
-                    window.location.href='/login';
-                }
-            } else {
-                alert(data.msg);
-            }
-    });
+            alert(data.msg);
+        });
     }
 </script>
 </html>

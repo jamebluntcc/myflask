@@ -209,7 +209,7 @@ def get_analysis_data(username, role, selected_project):
 
 def get_user_role(username, password=''):
     db = DBConn()
-    cmd = "select role from user_info where username='%s'" % username
+    cmd = "select role from user_info where username='%s' and status='Y'" % username
     if password:
         cmd += " and password='%s'" % password
     result = db.execute(cmd, get_all=False)
@@ -221,13 +221,22 @@ def save_user_info(info):
     time = datetime.datetime.now()
     info['create_time'] = time
     info['update_time'] = time
+    info['status'] = 'R'  # 'R' means review
     db = DBConn()
-    result = db.execute("select id from user_info where username='%s'" % info.get('username'), get_all=False)
+    result = db.execute("select id, status from user_info where username='%s'" % info.get('username'), get_all=False)
     if not result:
         db.insert('user_info', info)
-        return {'data': '', 'errcode': 0, 'msg': 'SUCCESS'}
+        ret = {'data': '', 'errcode': 0, 'msg': '注册成功：等待审核！'}
     else:
-        return {'data': '', 'errcode': 2, 'msg': '注册失败：该用户已经注册，请使用其它名字！'}
+        status = result[1]
+        if status == 'R':
+            ret = {'data': '', 'errcode': 2, 'msg': '该用户之前已经注册，但状态处于等待中，请使用其它名字注册！'}
+        elif status == 'Y':
+            ret = {'data': '', 'errcode': 3, 'msg': '注册失败：该用户已经注册，请使用其它名字！'}
+        else:
+            ret = {'data': '', 'errcode': 4, 'msg': '注册失败：该用户已经存在！'}
+
+    return ret
 
 
 def get_detail_sample_data(project_number):

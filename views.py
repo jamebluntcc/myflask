@@ -100,7 +100,10 @@ def register():
 @app.route('/save_user_info', methods=['GET'])
 def save_user_info():
     user_info = request.args.get('info')
-    data = interface.save_user_info(json.loads(user_info))
+    try:
+        data = interface.save_user_info(json.loads(user_info))
+    except Exception, e:
+        print e
     return jsonify(data)
 
 
