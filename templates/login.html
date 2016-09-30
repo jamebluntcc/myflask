@@ -6,11 +6,6 @@
 <title>登录</title>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}">
 </head>
-<style type="text/css">
-    .col-xs-3 {
-
-                }
-</style>
 <body>
     <div>
         <div class="login-box">
@@ -21,7 +16,7 @@
             <div class="login-content " align="center">
                 <div class="form" align="center">
                     <form action="#" method="post" align="center">
-                            <div class="col-xs-3  " align="center" style="float: unset">
+                            <div class="col-xs-3  " align="center" style="float: unset;margin:0 auto;">
                                 <div class="input-group" >
                                     <span class="input-group-addon">
                                         <span class="glyphicon glyphicon-user"></span>
@@ -64,7 +59,7 @@
             </div>
         </div>
     </div>
-    <div align="center">
+    <div id="show_qr_code" align="center">
         <p align="center">您可以在手机端浏览本网站，扫描二维码进入：</p>
         <img src="/static/image/qr_code.png" title="请用手机扫一扫！"/>
     </div>
@@ -73,6 +68,16 @@
 <script src="/static/js/jquery.cookie.js"></script>
 <script src="/static/js/main.js"></script>
 <script>
+    try {
+            var urlhash = window.location.hash;
+            if (!urlhash.match("fromapp")){
+                if ((navigator.userAgent.match(/(iPhone|iPod|Android|ios|iPad)/i))){
+                    $("#show_qr_code").hide();
+                }
+            }
+        }
+    catch(err)
+        {}
 function login_in(){
     var username = $("#username").val();
     var password = $("#password").val();
