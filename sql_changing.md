@@ -190,3 +190,8 @@ CREATE TABLE `user_info` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username_UNIQUE` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+ALTER TABLE `SEQ_SA_INFO`.`user_info`
+CHANGE COLUMN `company` `company` VARCHAR(100) NULL DEFAULT '' ,
+ADD COLUMN `field` VARCHAR(100) NULL DEFAULT '' AFTER `status`;

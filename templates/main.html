@@ -4,34 +4,6 @@
     <meta charset="UTF-8">
     <title>建库信息系统</title>
 </head>
-<body>
-    欢迎登录建库信息系统
-    {% if role=='manager' %}
-    <br >
-    你的角色是管理员，可以查看负责人为你的项目信息。
-    <br >管理员: {{ username }}
-    {% else %}
-    <br >用户名: {{ username }}
-    {% endif %}
-    <br >
-
-    <br >
-    {% if role=='user' %}
-    <a href="/input_info"><input type="button" value="新建项目"/></a>
-    <a href="/select_project"><input type="button" value="数据分析" /></a>
-    <table id="show_all"></table>
-    {% elif role=='manager' %}
-    <table id="show_all"></table>
-    <span><b>查看项目分析数据:</b></span><br>
-    <span>选择项目编号:</span>
-    <select id="selected_project" onchange="show_render()">
-        {% for option in project_num_list %}
-            <option value ="{{ option }}">{{ option }}</option>
-        {% endfor %}
-    </select>
-    {% endif %}
-    <div id="detail" class="detail"></div>
-</body>
 <link href="/static/css/jquery-ui.css" rel="stylesheet">
 <link href="/static/css/ui.jqgrid.css" rel="stylesheet">
 <script src="/static/js/jquery-2.0.0.min.js"></script>
@@ -43,6 +15,51 @@
 <script src="/static/js/jquery.cookie.js/"></script>
 <script src="/static/js/jquery.msgBox.v1.js/"></script>
 <script src="/static/js/main.js"></script>
+<body>
+<div class="container">
+	<div class="row clearfix">
+		<div class="col-md-8 column">
+            <div id="header">
+                <div>
+                    <h2>欢迎登录建库信息系统</h2>
+                </div>
+                <div>
+                    {% if role=='manager' %}
+                        <br >
+                        你的角色是管理员，可以查看负责人为你的项目信息。
+                        <br >管理员: {{ username }}
+                    {% else %}
+                        <br >用户名: {{ username }}
+                    {% endif %}
+                    <input type="button" onclick="quit_login();" value="退出登录"/>
+                </div>
+            </div>
+		</div>
+	</div>
+    <br/>
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+            <div>
+        {% if role=='user' %}
+            <a href="/input_info"><input type="button" value="新建项目"/></a>
+            <a href="/select_project"><input type="button" value="数据分析" /></a>
+            <table id="show_all"></table>
+        {% elif role=='manager' %}
+            <table id="show_all"></table>
+            <span><b>查看项目分析数据:</b></span><br>
+            <span>选择项目编号:</span>
+            <select id="selected_project" onchange="show_render()">
+                {% for option in project_num_list %}
+                    <option value ="{{ option }}">{{ option }}</option>
+                {% endfor %}
+            </select>
+        {% endif %}
+    </div>
+    <div id="detail" class="detail"></div>
+		</div>
+	</div>
+</div>
+</body>
 <script>
     var role = "{{ role }}";
     var table_title =  "我申请的项目:（双击行可修改项目）";
@@ -100,6 +117,12 @@
         $("#show_all").setCell(row_id, 'save', '');
         var project_number = $("#show_all").getCell(row_id, 'project_number');
         $("#show_all").saveRow(row_id, 'status', '/save_status', {'project_number': project_number});
+    }
+
+    function quit_login() {
+        ajaxSend('/quit_login', {}, function(){
+            window.location.href='/login';
+        });
     }
 
 </script>

@@ -19,10 +19,17 @@ def main():
     username = session.get('login_id')
     if not username:
         return redirect('/login')
-    user_role = interface.get_user_role(username)
+    user_role, status = interface.get_user_role(username)
+    (e_mail, tel, company, field) = interface.get_other_info(username)
     project_num_list = ['']
     project_num_list += interface.get_project_number_list(username, user_role)
-    return render_template('main.html', username=username, role=user_role, project_num_list=project_num_list)
+    return render_template('main2.html', username=username,
+                           role=user_role,
+                           e_mail=e_mail,
+                           tel=tel,
+                           company=company,
+                           field=field,
+                           project_num_list=project_num_list)
 
 
 @app.route('/save_input', methods=['GET'])
@@ -64,17 +71,25 @@ def check_login():
     args = request.args
     username = args.get('username')
     pwd = args.get('password')
-    user_role = interface.get_user_role(username, pwd)
+    user_role, status = interface.get_user_role(username, pwd)
+
     if not username or not pwd or not user_role:
-        return jsonify({'data': '', 'errcode': 1, 'msg': 'Login Failed！'})
+        return jsonify({'data': '', 'errcode': 2, 'msg': '登录失败, 请确认用户名和密码输入正确！'})
+    elif status == 'R':
+        return jsonify({'data': '', 'errcode': 1, 'msg': '该用户还未通过审核， 请等待管理员审核！'})
     elif user_role == 'user':
         session['login_id'] = username
-        return jsonify({'data': '', 'errcode': 0, 'msg': 'Login Success！'})
-
+        return jsonify({'data': '', 'errcode': 0, 'msg': '登录成功！'})
     elif user_role == 'manager':
         # TODO: show manager page
         session['login_id'] = username
-        return jsonify({'data': '', 'errcode': 0, 'msg': 'Login Success！'})
+        return jsonify({'data': '', 'errcode': 0, 'msg': '登录成功！'})
+
+
+@app.route('/quit_login', methods=['GET', 'POST'])
+def quit_login():
+    session['login_id'] = None
+    return redirect('/login')
 
 
 @app.route('/analysis', methods=['GET'])
@@ -83,7 +98,7 @@ def analysis():
     username = session.get('login_id')
     if not username:
         return redirect('/login')
-    user_role = interface.get_user_role(username)
+    user_role, status = interface.get_user_role(username)
     data = interface.get_analysis_data(username, user_role, selected_project)
     action = 'update' if data else 'new'
     project_list = interface.get_project_number_list(username, user_role)
@@ -107,6 +122,26 @@ def save_user_info():
     return jsonify(data)
 
 
+@app.route('/modify_base_info', methods=['GET'])
+def modify_base_info():
+    user_info = request.args.get('info')
+    try:
+        data = interface.modify_base_info(json.loads(user_info))
+    except Exception, e:
+        print e
+    return jsonify(data)
+
+
+@app.route('/change_password', methods=['GET'])
+def change_password():
+    user_info = request.args.get('info')
+    try:
+        data = interface.change_password(json.loads(user_info))
+    except Exception, e:
+        print e
+    return jsonify(data)
+
+
 @app.route('/get_all_data', methods=['GET', 'POST'])
 def get_all_data():
     username = session.get('login_id')
@@ -122,7 +157,7 @@ def input_info():
     username = session.get('login_id')
     if not username:
         return redirect('/login')
-    user_role = interface.get_user_role(username)
+    user_role, status = interface.get_user_role(username)
     action = request.args.get('action')
     action = 'new' if not action else action
     project_number = request.args.get('project_number')
@@ -168,7 +203,7 @@ def select_project():
     username = session.get('login_id')
     if not username:
         return redirect('/login')
-    user_role = interface.get_user_role(username)
+    user_role, status = interface.get_user_role(username)
     project_list = interface.get_project_number_list(username, user_role)
 
     return render_template('select_project.html', project_list=project_list)

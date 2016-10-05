@@ -1,99 +1,215 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0" />
-<title>注册</title>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0" />
+    <title>注册</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <link href="/static/css/register.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-<div class="box">
-<div class="login-box">
-<div class="login-title text-center">
-<h1><small>注册</small></h1>
-</div>
-<div class="login-content ">
-<div class="form">
-<form action="#" method="post">
-<div class="input-group">
-    <span class="input-group-addon"><span class="glyphicon glyphicon-apple"></span>注册类型</span>
-    <select id="role" name="role" class="form-control" style="width: 200px">
-        <option value="user">用户</option>
-        <option value="manager">管理员</option>
-    </select>
-</div>
-    <br>
-<div class="input-group">
-    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-    <input type="text" id="username" name="username" class="form-control" placeholder="用户名" style="width: 500px">
-</div>
+    <div class="box">
+        <div class="login-box">
+            <div class="login-title text-center">
+                <h1><small>注册</small></h1>
+            </div>
+            <div class="login-content ">
+                <div class="form">
+                    <form action="#" method="post">
+                        <div class="input-group">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-apple"></span>注册类型</span>
+                            <select id="role" name="role" class="form-control" style="width: 200px">
+                                <option value="user">用户</option>
+                                <option value="manager">管理员</option>
+                            </select>
+                        </div>
+                        <br>
+                        <div class="input-group">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                            <input type="text" id="username" name="username" class="form-control" placeholder="用户名" style="width: 500px">
+                            * <div id="username-mess"></div>
+                        </div>
+                        <br>
+                        <div class="input-group">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                            <input type="password" id="password" name="password" class="form-control" placeholder="密码" style="width: 500px">
+                            * <div id="password-mess"></div>
+                        </div>
+                        <br>
+                        <div class="input-group">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                            <input type="text" id="company" name="Company" class="form-control" placeholder="用户所在单位" style="width: 500px">
+                        </div>
+                        <br>
+                        <div class="input-group">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-leaf"></span></span>
+                            <input type="text" id="field" name="field" class="form-control" placeholder="研究领域" style="width: 500px">
+                        </div>
+                        <br>
+                        <div class="input-group">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                            <input type="text" id="email" name="email" class="form-control" placeholder="Email" style="width: 500px">
+                        * <div id="email-mess"></div>
+                    </div>
+                        <br>
+                        <div class="input-group div-phone">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-earphone"></span></span>
+                            <input type="text" id="tel" name="tel" class="form-control" placeholder="手机" style="width: 500px">
+{#                            <a href="javascript:;" class="send1" onclick="sends.send();">发送验证码</a>#}
+                            * <div id="tel-mess"></div>
+                        </div>
+                        <br>
+{#                        <div class="input-group">#}
+{#                            <span class="input-group-addon"><span class="glyphicon glyphicon-leaf"></span></span>#}
+{#                            <input type="text" id="verification" name="verifer-code" class="form-control" placeholder="请输入验证码" style="width: 500px">#}
+{#                            <div id="verification-mess"></div>#}
+{#                        </div>#}
 
-<br>
-<div class="input-group">
-    <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-    <input type="password" id="password" name="password" class="form-control" placeholder="密码" style="width: 500px">
-</div>
-<br>
-<div class="input-group">
-    <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
-    <input type="text" id="email" name="email" class="form-control" placeholder="Email" style="width: 500px">
-</div>
-<br>
-<div class="input-group">
-    <span class="input-group-addon"><span class="glyphicon glyphicon-earphone"></span></span>
-    <input type="text" id="tel" name="tel" class="form-control" placeholder="电话" style="width: 500px">
-</div>
-
-
-
-
-<div class="form-group form-actions">
-    <div class="col-xs-4">
-        <br>
-        <input type="button" class="btn btn-info" onclick="register_user()"  value="注册"/>
+                        <div class="form-group form-actions">
+                            <div class="col-xs-4">
+                                <br>
+                                <input type="button" class="btn btn-info" onclick="register_user()"  value="注册"/>
+                                <input type="button" class="btn btn-info" onclick="window.location.href='/login';" value="已有账户？返回登录"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-</form>
-</div>
-</div>
-</div>
-</div>
 </body>
 <script src="/static/js/jquery-2.0.0.min.js"></script>
 <script src="/static/js/main.js"></script>
 <script>
     function register_user() {
+        $("#username").blur();
+        $("#password").blur();
+        $("#email").blur();
+        $("#tel").blur();
+        $("#verification").blur();
         var username = $("#username").val();
         var password = $("#password").val();
         var e_mail = $("#email").val();
         var tel = $("#tel").val();
-        if (!username) {
-            alert('请输入用户名！');
-            return;
-        }
-        else if (!password) {
-            alert('请输入密码！');
-            return;
-        }
-        else if (!e_mail) {
-            alert('请输入电子邮箱！');
-            return;
-        }
-        else if (!password) {
-            alert('请输入联系号码！');
-            return;
-        }
+        var validate = $('.mess');
         var role =$("#role").val();
+        var company = $("#company").val();
+        var field = $("#field").val();
+        if (validate.length>0) {
+            alert(validate[0].innerHTML);
+            return;
+        }
         var info = {
             'username': username,
             'password': password,
             'e_mail': e_mail,
             'tel': tel,
-            'role': role
+            'role': role,
+            'field': field,
+            'company': company
         }
         ajaxSend('/save_user_info', {"info": JSON.stringify(info)}, function(data){
-            alert(data.msg);
+            var msg = data.msg;
+            alert(msg);
+            if (msg.indexOf('成功') != -1) {
+                window.location.href='/login';
+            }
         });
+    }
+
+    $("#username").blur(function(){
+        var obj = $("#username-mess");
+        var username = $("#username").val();
+        obj.children().remove();
+        if (!username) {
+            obj.append("<span class='mess'>用户名不能为空!</span>");
+        }
+    });
+
+    $("#password").blur(function(){
+        var obj = $("#password-mess");
+        var password = $("#password").val();
+        obj.children().remove();
+        if (!password) {
+            obj.append("<span class='mess'>密码不能为空!</span>");
+        }
+    });
+
+    $("#email").blur(function(){
+        var obj = $("#email-mess");
+        var email = $("#email").val();
+        var reg = /\w+[@]{1}\w+[.]\w+/;
+        obj.children().remove();
+        if (!email) {
+            obj.append("<span class='mess'>Email不能为空!</span>");
+        }
+        else if (!reg.test(email)) {
+            obj.append("<span class='mess'>您输入的Email错误，请重新输入！</span>");
+        }
+    });
+
+    $("#tel").blur(function(){
+        var obj = $("#tel-mess");
+        var tel = $("#tel").val();
+        var reg = /(1[3-9]\d{9}$)/;
+        obj.children().remove();
+        if (!tel) {
+            obj.append("<span class='mess'>手机号不能为空!</span>");
+        }
+        else if (!reg.test(tel)) {
+            obj.append("<span class='mess'>您输入的手机号错误，请重新输入！</span>");
+        }
+    });
+
+    $("#verification").blur(function(){
+        var obj = $("#verification-mess");
+        var verification = $("#verification").val();
+        obj.children().remove();
+        if (!verification) {
+            obj.append("<span class='mess'>验证码不能为空!</span>");
+        }
+        else{
+            obj.append("<span class='mess'>验证码错误！</span>");
+        }
+    });
+
+    var sends = {
+        checked:0,
+        send:function(){
+            var tel = $('#tel').val().replace(/\s+/g,""); //获取输入手机号码
+            var numbers = /^1\d{10}$/;
+            if($('#tel-mess').find('span').length == 0 && $('.div-phone a').attr('class') == 'send1'){
+                if(!numbers.test(tel) || tel.length ==0){
+                    return false;
+                }
+            }
+            //var registered = is_registered();
+            var registered = false;
+            if (registered) {
+                $('#tel-mess span').remove();
+                $("#tel-mess").append("<span class='mess'>该手机号码已经注册，请直接登陆或者使用其它号码注册!</span>");
+                return false;
+            }
+            if (numbers.test(tel) && !sends.checked ){
+                var time = 30;
+                $('#tel-mess span').remove();
+                function timeCountDown(){
+                    if(time==0){
+                        clearInterval(timer);
+                        $('.div-phone a').addClass('send1').removeClass('send0').html("发送验证码");
+                        sends.checked = 0;
+                        return true;
+                    }
+                    $('.div-phone a').html(time+"S后再次发送");
+                    time--;
+                    sends.checked = 1;
+                    return false;
+                }
+                $('.div-phone a').addClass('send0').removeClass('send1');
+                timeCountDown();
+                var timer = setInterval(timeCountDown,1000);
+            }
+        }
     }
 </script>
 </html>

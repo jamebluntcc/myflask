@@ -19,6 +19,7 @@ table1_map = {
     '数据量（raw data）': 'data_size'
 }
 
+
 def save_info(all_info, username, action='new'):
     db_instance = DBConn()
     try:
@@ -207,14 +208,70 @@ def get_analysis_data(username, role, selected_project):
     return dict(result) if result else {}
 
 
+def phone_check(s):
+    phone_prefix = ['130', '131', '132', '133', '134', '135', '136', '137', '138', '139', '150',
+                    ' 151', '152', '153', '156', '158', '159', '170', '183', '182', '185', '186', '188', '189']
+
+    return True if len(s) == 11 and s.isdigit() and s[:3] in phone_prefix else False
+
+
 def get_user_role(username, password=''):
     db = DBConn()
-    cmd = "select role from user_info where username='%s' and status='Y'" % username
+    if phone_check(username):
+        cmd = "select role,status from user_info where tel='%s'" % username
+    else:
+        cmd = "select role,status from user_info where username='%s'" % username
     if password:
         cmd += " and password='%s'" % password
     result = db.execute(cmd, get_all=False)
     role = result[0] if result else ''
-    return role
+    status = result[1] if result else ''
+    return role, status
+
+
+def get_other_info(username):
+    db = DBConn()
+    if phone_check(username):
+        cmd = "select e_mail, tel, company, field from user_info where tel='%s'" % username
+    else:
+        cmd = "select e_mail, tel, company, field from user_info where username='%s'" % username
+    result = db.execute(cmd, get_all=False)
+
+    return result if result else ('', '', '', '')
+
+
+def modify_base_info(info):
+    time = datetime.datetime.now()
+    info['update_time'] = time
+    username = info.get('username')
+    tel = info.get('tel')
+    db = DBConn()
+    cmd = "select id from user_info where username!='%s' and tel='%s'" % (username, tel)
+    check_result = db.execute(cmd, get_all=False)
+    if check_result:
+        return {'data': '', 'errcode': 1, 'msg': '该电话号码已经被其它用户注册，请使用其它号码！'}
+    else:
+        db.update('user_info', {'username': username}, info)
+        return {'data': '', 'errcode': 0, 'msg': '更新成功！'}
+
+
+def change_password(info):
+    username = info['username']
+    db = DBConn()
+    cmd = "select password from user_info where username='%s'" % username
+    result = db.execute(cmd, get_all=False)
+    if result and result[0] == info['old_passwd'] and info['new_passwd'] != info['old_passwd']:
+        db.update('user_info', {'username': username}, {'password': info['new_passwd'],
+                                                        'update_time': datetime.datetime.now()})
+        return {'data': '', 'errcode': 0, 'msg': '更新成功！'}
+    elif result and result[0] != info['old_passwd']:
+        return {'data': '', 'errcode': 1, 'msg': '旧密码错误！'}
+    elif info['new_passwd'] == info['old_passwd']:
+        return {'data': '', 'errcode': 1, 'msg': '新密码和旧密码不能一样！'}
+    else:
+        return {'data': '', 'errcode': 1, 'msg': '用户名不存在！'}
+
+
 
 
 def save_user_info(info):
@@ -222,19 +279,30 @@ def save_user_info(info):
     info['create_time'] = time
     info['update_time'] = time
     info['status'] = 'R'  # 'R' means review
+    if len(info['password']) < 10:
+        return {'data': '', 'errcode': 3, 'msg': "密码设置过短，请设置为10位以上！"}
     db = DBConn()
-    result = db.execute("select id, status from user_info where username='%s'" % info.get('username'), get_all=False)
-    if not result:
+    name_result = db.execute("select id, status from user_info where username='%s'" % info.get('username'), get_all=False)
+    tel_result = db.execute("select id, status from user_info where tel='%s'" % info.get('tel'), get_all=False)
+
+    def fail_info(sql_result, check_type):
+        status = sql_result[1]
+        if status == 'R':
+            msg = '该{check_type}之前已经注册，但状态处于等待中，请使用其它{check_type}注册！'
+        elif status == 'Y':
+            msg = '注册失败：该{check_type}已经注册，请使用其它{check_type}！'
+        else:
+            msg = '注册失败：该{check_type}已经存在！'
+
+        return {'data': '', 'errcode': 2, 'msg': msg.format(check_type=check_type)}
+
+    if name_result:
+        ret = fail_info(name_result, '名字')
+    elif tel_result:
+        ret = fail_info(tel_result, '电话号码')
+    else:
         db.insert('user_info', info)
         ret = {'data': '', 'errcode': 0, 'msg': '注册成功：等待审核！'}
-    else:
-        status = result[1]
-        if status == 'R':
-            ret = {'data': '', 'errcode': 2, 'msg': '该用户之前已经注册，但状态处于等待中，请使用其它名字注册！'}
-        elif status == 'Y':
-            ret = {'data': '', 'errcode': 3, 'msg': '注册失败：该用户已经注册，请使用其它名字！'}
-        else:
-            ret = {'data': '', 'errcode': 4, 'msg': '注册失败：该用户已经存在！'}
 
     return ret
 
@@ -379,6 +447,31 @@ def upload_excel(io_stream):
     os.rename(temp_file_path, file_path)
     data = transfer_excel_to_json(file_path)
     return {'data': data, 'errcode': 0, 'msg': '上传成功'}
+
+
+def call_sms_service(ipaddr):
+    import requests
+    account_sid = '518d949550f3567866c2694f4988f889'
+    auth_token = 'ca4624f01d3ed40b30d09ff1cc1c374b'
+    service_host = 'https://api.ucpaas.com/2014-06-30/Accounts/{account_sid}/Messages/templateSMS'
+    payload = {
+         "templateSMS": {
+             "appId": "caabd9b5be1b4ff8a8592068b230c339",
+             "param": "0000",
+             "templateId": "30213",
+             "to": ipaddr
+             }
+    }
+
+    head = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json;charset=utf-8',
+        'Authorization': 'ZTAzYmM5MTA2YzZlZDBlYWViZmNlOGMzNjhmZGNkNDg6MjAxNDA2MjMxODUwMjE'
+    }
+
+    r = requests.post(service_host, data=payload, headers=head)
+    print r
+    return
 
 if __name__ == '__main__':
     # print transfer_excel_to_json('/home/chenjialin/下载/Table.1.xls')

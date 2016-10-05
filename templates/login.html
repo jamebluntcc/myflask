@@ -21,7 +21,7 @@
                                     <span class="input-group-addon">
                                         <span class="glyphicon glyphicon-user"></span>
                                     </span>
-                                    <input type="text" id="username" name="username" class="form-control" placeholder="用户名" >
+                                    <input type="text" id="username" name="username" class="form-control" placeholder="用户名/手机号码" >
                                 </div>
                                 <div class="input-group">
                                     <span class="input-group-addon">
@@ -94,9 +94,9 @@ function login_in(){
     }
 
     ajaxSend('/check_login', {"username":username, "password":password}, function(data){
-        console.log(data);
         if (data.errcode == 0) {
             window.location.href='/';
+            $.cookie('username', username);
         } else {
             alert(data.msg);
         }
