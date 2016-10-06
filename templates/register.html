@@ -13,7 +13,7 @@
             <div class="login-title text-center">
                 <h1><small>注册</small></h1>
             </div>
-            <div class="login-content ">
+            <div class="login-content" style="padding: 50px 250px 10px;">
                 <div class="form">
                     <form action="#" method="post">
                         <div class="input-group">
@@ -25,38 +25,39 @@
                         </div>
                         <br>
                         <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                            <span class="input-group-addon">*<span class="glyphicon glyphicon-user"></span></span>
                             <input type="text" id="username" name="username" class="form-control" placeholder="用户名" style="width: 500px">
-                            * <div id="username-mess"></div>
+                            <span><span id="username-mess"></span></span>
                         </div>
                         <br>
                         <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                            <span class="input-group-addon">*<span class="glyphicon glyphicon-lock"></span></span>
                             <input type="password" id="password" name="password" class="form-control" placeholder="密码" style="width: 500px">
-                            * <div id="password-mess"></div>
+                            <div id="password-mess"></div>
                         </div>
                         <br>
                         <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                            <span class="input-group-addon">&nbsp;<span class="glyphicon glyphicon-user"></span></span>
                             <input type="text" id="company" name="Company" class="form-control" placeholder="用户所在单位" style="width: 500px">
                         </div>
                         <br>
                         <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-leaf"></span></span>
+                            <span class="input-group-addon">&nbsp;<span class="glyphicon glyphicon-leaf"></span></span>
                             <input type="text" id="field" name="field" class="form-control" placeholder="研究领域" style="width: 500px">
                         </div>
                         <br>
                         <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span></span>
+                            <span class="input-group-addon">*<span class="glyphicon glyphicon-envelope"></span></span>
                             <input type="text" id="email" name="email" class="form-control" placeholder="Email" style="width: 500px">
-                        * <div id="email-mess"></div>
+                            <div id="email-mess">
+                        </div>
                     </div>
                         <br>
                         <div class="input-group div-phone">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-earphone"></span></span>
+                            <span class="input-group-addon">*<span class="glyphicon glyphicon-earphone"></span></span>
                             <input type="text" id="tel" name="tel" class="form-control" placeholder="手机" style="width: 500px">
 {#                            <a href="javascript:;" class="send1" onclick="sends.send();">发送验证码</a>#}
-                            * <div id="tel-mess"></div>
+                            <div id="tel-mess"></div>
                         </div>
                         <br>
 {#                        <div class="input-group">#}
@@ -65,8 +66,9 @@
 {#                            <div id="verification-mess"></div>#}
 {#                        </div>#}
 
+                        <a>图标带*的为必填项！</a>
                         <div class="form-group form-actions">
-                            <div class="col-xs-4">
+                            <div class="col-xs-10">
                                 <br>
                                 <input type="button" class="btn btn-info" onclick="register_user()"  value="注册"/>
                                 <input type="button" class="btn btn-info" onclick="window.location.href='/login';" value="已有账户？返回登录"/>
