@@ -169,6 +169,16 @@ def show_all_data(username, role='user'):
     return data
 
 
+def get_all_user_data():
+    data = []
+    cmd = "select username,e_mail email,tel,company,age,role,field,status,notes from user_info"
+    results = DBConn().execute(cmd)
+    for result in results:
+        data.append(dict(result))
+
+    return data
+
+
 def get_one_project_data(project_number):
     cmd = """select * from sample_project_master spm,
              sample_species ss,
@@ -339,6 +349,11 @@ def get_analysis_table_data(username, selected_project):
 def save_status(project_number, status):
     db = DBConn()
     db.update('sample_project_master', {'project_number': project_number}, {'status': status})
+
+
+def admin_save_user_info(username, status):
+    db = DBConn()
+    db.update('user_info', {'username': username}, {'status': status})
 
 
 def get_project_number_list(username, user_role):

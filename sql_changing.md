@@ -195,3 +195,7 @@ CREATE TABLE `user_info` (
 ALTER TABLE `SEQ_SA_INFO`.`user_info`
 CHANGE COLUMN `company` `company` VARCHAR(100) NULL DEFAULT '' ,
 ADD COLUMN `field` VARCHAR(100) NULL DEFAULT '' AFTER `status`;
+
+
+ALTER TABLE `SEQ_SA_INFO`.`user_info`
+ADD COLUMN `notes` VARCHAR(200) NULL DEFAULT '' AFTER `field`;

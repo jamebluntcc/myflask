@@ -152,6 +152,15 @@ def get_all_data():
     return jsonify({'data': data, 'errcode': 0, 'msg': 'Success'})
 
 
+@app.route('/get_all_user_data', methods=['GET', 'POST'])
+def get_all_user_data():
+    username = session.get('login_id')
+    if not username:
+        return redirect('/login')
+    data = interface.get_all_user_data()
+    return jsonify({'data': data, 'errcode': 0, 'msg': 'Success'})
+
+
 @app.route('/input_info')
 def input_info():
     username = session.get('login_id')
@@ -195,6 +204,17 @@ def save_status():
     status = request.form['status']
     project_number = request.form['project_number']
     data = interface.save_status(project_number, status)
+    return jsonify({'data': data, 'errcode': 0, 'msg': 'Success'})
+
+
+@app.route('/admin_save_user_info', methods=['GET', 'POST'])
+def admin_save_user_info():
+    username = session.get('login_id')
+    if not username:
+        return redirect('/login')
+    status = request.form['status']
+    username = request.form['username']
+    data = interface.admin_save_user_info(username, status)
     return jsonify({'data': data, 'errcode': 0, 'msg': 'Success'})
 
 
