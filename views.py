@@ -77,6 +77,8 @@ def check_login():
         return jsonify({'data': '', 'errcode': 2, 'msg': '登录失败, 请确认用户名和密码输入正确！'})
     elif status == 'R':
         return jsonify({'data': '', 'errcode': 1, 'msg': '该用户还未通过审核， 请等待管理员审核！'})
+    elif status == 'N':
+        return jsonify({'data': '', 'errcode': 1, 'msg': '管理员拒绝通过审核或者该帐号已被禁用， 详情请联系系统管理员！'})
     elif user_role == 'user':
         session['login_id'] = username
         return jsonify({'data': '', 'errcode': 0, 'msg': '登录成功！'})
