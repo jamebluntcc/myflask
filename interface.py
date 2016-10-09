@@ -242,9 +242,9 @@ def get_user_role(username, password=''):
 def get_other_info(username):
     db = DBConn()
     if phone_check(username):
-        cmd = "select e_mail, tel, company, field from user_info where tel='%s'" % username
+        cmd = "select e_mail, tel, company, field, customer_name from user_info where tel='%s'" % username
     else:
-        cmd = "select e_mail, tel, company, field from user_info where username='%s'" % username
+        cmd = "select e_mail, tel, company, field, customer_name from user_info where username='%s'" % username
     result = db.execute(cmd, get_all=False)
 
     return result if result else ('', '', '', '')

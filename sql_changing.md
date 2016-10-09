@@ -199,3 +199,7 @@ ADD COLUMN `field` VARCHAR(100) NULL DEFAULT '' AFTER `status`;
 
 ALTER TABLE `SEQ_SA_INFO`.`user_info`
 ADD COLUMN `notes` VARCHAR(200) NULL DEFAULT '' AFTER `field`;
+
+
+ALTER TABLE `SEQ_SA_INFO`.`user_info`
+ADD COLUMN `customer_name` VARCHAR(45) NULL DEFAULT '' AFTER `username`;

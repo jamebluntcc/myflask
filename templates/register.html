@@ -44,8 +44,8 @@
                         </div>
                         <br>
                         <div class="input-group">
-                            <span class="input-group-addon">*<span class="glyphicon glyphicon-user"></span></span>
-                            <input type="text" id="customername" name="customername" class="form-control" placeholder="真实姓名" style="width: 260px">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                            <input type="text" id="customer_name" name="customer_name" class="form-control" placeholder="真实姓名" style="width: 260px">
                         </div>
                         <br>
                         <div class="input-group">
@@ -103,6 +103,7 @@
         $("#verification").blur();
         var username = $("#username").val();
         var password = $("#password").val();
+        var customer_name = $("#customer_name").val();
         var e_mail = $("#email").val();
         var tel = $("#tel").val();
         var validate = $('.mess');
@@ -120,7 +121,8 @@
             'tel': tel,
             'role': role,
             'field': field,
-            'company': company
+            'company': company,
+            'customer_name': customer_name
         }
         ajaxSend('/save_user_info', {"info": JSON.stringify(info)}, function(data){
             var msg = data.msg;

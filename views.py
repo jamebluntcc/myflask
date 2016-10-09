@@ -20,7 +20,7 @@ def main():
     if not username:
         return redirect('/login')
     user_role, status = interface.get_user_role(username)
-    (e_mail, tel, company, field) = interface.get_other_info(username)
+    (e_mail, tel, company, field, customer_name) = interface.get_other_info(username)
     project_num_list = ['']
     project_num_list += interface.get_project_number_list(username, user_role)
     return render_template('main2.html', username=username,
@@ -28,6 +28,7 @@ def main():
                            e_mail=e_mail,
                            tel=tel,
                            company=company,
+                           customer_name=customer_name,
                            field=field,
                            project_num_list=project_num_list)
 
