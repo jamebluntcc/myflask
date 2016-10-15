@@ -168,7 +168,7 @@
                      <div class="form-group">
                         <label class="col-sm-2 control-label">姓名</label>
                         <div class="col-sm-10">
-                            <label class="col-sm-2 control-label">{{ customer_name }}</label>
+                            <label class="col-sm-2 control-label">{{ customer_name or '未填写'}}</label>
                         </div>
                     </div>
                     <div class="form-group">
@@ -272,7 +272,7 @@
         $("#self_info").hide();
         $("#detail").children().remove();
         $("#detail").append("<table id='show_all'></table>");
-        var table_title =  "所有的用户:（双击行可修改信息）";
+        var table_title =  "所有的用户:（双击行可修改信息）<button onclick='export_user_info()'>导出用户数据</button>";
         var status_list = {'Y': 'Y', 'R': 'R', 'N': 'N'};
         $("#show_all").jqGrid({
             datatype: 'local',
@@ -439,6 +439,13 @@
         table_obj.setCell(row_id, 'save', '');
         var username = table_obj.getCell(row_id, 'username');
         $("#show_all").saveRow(row_id, 'status', '/admin_save_user_info', {'username': username});
+    }
+
+
+    function export_user_info() {
+        ajaxSend('/export_user_info', {}, function (filename) {
+            window.location.href = '/static/export/' + filename;
+        }, 'POST');
     }
 
 </script>

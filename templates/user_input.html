@@ -158,6 +158,11 @@ li {float: left; list-style: none}
         {% endif %}
         <table id="input_detail_info"></table>
 	</div>
+    <h1>Upload File</h1>
+    <form action="upload" method="post" enctype="multipart/form-data">
+        <input type="file" multiple="" name="file[]" class="span3" /><br/>
+        <input type="submit" value="Upload" class="span2">
+   </form>
     <br>
     <br>
     {% if action=='new' %}

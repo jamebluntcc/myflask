@@ -239,5 +239,29 @@ def upload():
     ret = interface.upload_excel(io_stream)
     return jsonify(ret)
 
+
+@app.route('/upload_project_file', methods=['GET', 'POST'])
+def upload_project_file():
+    project_id = request.args.get('project_id')
+    io_stream = request.files['file_data']
+    filename = secure_filename(io_stream.filename)
+    try:
+        ret = interface.upload_project_file(io_stream, filename, project_id)
+    except Exception, e:
+        import traceback
+        traceback.print_exc()
+    return jsonify(ret)
+
+
+@app.route('/export_user_info', methods=['GET', 'POST'])
+def export_user_info():
+
+    return interface.export_user_info()
+
+
+@app.route('/get_upload_page', methods=['GET', 'POST'])
+def get_upload_page():
+    return render_template('upload_project_file.html', project_id=1)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)

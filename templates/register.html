@@ -6,6 +6,9 @@
     <title>注册</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}">
     <link href="/static/css/register.css" type="text/css" rel="stylesheet" />
+    <script src="/static/js/jquery-2.0.0.min.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
 </head>
 <body>
     <div class="box">
@@ -42,9 +45,15 @@
                             <input type="password" id="password" name="password" class="form-control" placeholder="密码" style="width: 260px">
                             <div id="password-mess"></div>
                         </div>
+                        <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon">*<span class="glyphicon glyphicon-lock"></span></span>
+                            <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="确认密码" style="width: 260px">
+                            <div id="confirm_password-mess"></div>
+                        </div>
                         <br>
                         <div class="input-group">
-                            <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                            <span class="input-group-addon">&nbsp;<span class="glyphicon glyphicon-user"></span></span>
                             <input type="text" id="customer_name" name="customer_name" class="form-control" placeholder="真实姓名" style="width: 260px">
                         </div>
                         <br>
@@ -55,7 +64,45 @@
                         <br>
                         <div class="input-group">
                             <span class="input-group-addon">&nbsp;<span class="glyphicon glyphicon-leaf"></span></span>
-                            <input type="text" id="field" name="field" class="form-control" placeholder="研究领域" style="width: 260px">
+                            <div>
+                            <input type="text" id="field" name="field" class="form-control" placeholder="选择研究领域" style="width: 258px">
+                                <div class="dropdown">
+                                    <button type="button" class="btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" style="padding: 14px 2px;">
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">生物学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">植物学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">动物学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">生物化学和分子生物学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">生物物理学与生物医学工程学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">神经生物学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">生理学 </a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">心理学 </a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">细胞生物学及发育生物学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">遗传学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">生态学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">农业基础科学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">农学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">畜牧/兽医学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">蚕桑/养蜂学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">水产学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">林学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">预防医学与卫生学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">基础医学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">临床医学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">药物学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">中医中药学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">生物信息学</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" onclick="set_field_value(this.innerHTML)">其他</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!--<select id="field" name="field" class="form-control" style="width: 260px;color:#b5bfcc">-->
+                                <!--<option value="">请选择研究领域</option>-->
+                                <!--<option value="用户">用户</option>-->
+                                <!--<option value="管理员">管理员</option>-->
+                            <!--</select>-->
                         </div>
                         <br>
                         <div class="input-group">
@@ -92,12 +139,15 @@
         </div>
     </div>
 </body>
-<script src="/static/js/jquery-2.0.0.min.js"></script>
-<script src="/static/js/main.js"></script>
 <script>
+    function set_field_value(value) {
+        $('#field')[0].value=value;
+    }
+
     function register_user() {
         $("#username").blur();
         $("#password").blur();
+        $("#confirm_password").blur();
         $("#email").blur();
         $("#tel").blur();
         $("#verification").blur();
@@ -148,6 +198,19 @@
         obj.children().remove();
         if (!password) {
             obj.append("<span class='mess'>密码不能为空!</span>");
+        }
+        else if (password.length<11) {
+            obj.append("<span class='mess'>密码长度必须超过10位!</span>");
+        }
+    });
+
+    $("#confirm_password").blur(function(){
+        var obj = $("#confirm_password-mess");
+        var password = $("#password").val();
+        var confirm_password = $("#confirm_password").val();
+        obj.children().remove();
+        if (password != confirm_password) {
+            obj.append("<span class='mess'>两次输入的密码不一致!</span>");
         }
     });
 

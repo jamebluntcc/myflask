@@ -2,6 +2,7 @@
 import datetime
 import os
 import xlrd
+from openpyxl import Workbook
 
 from db import DBConn
 
@@ -282,8 +283,6 @@ def change_password(info):
         return {'data': '', 'errcode': 1, 'msg': '用户名不存在！'}
 
 
-
-
 def save_user_info(info):
     time = datetime.datetime.now()
     info['create_time'] = time
@@ -488,7 +487,65 @@ def call_sms_service(ipaddr):
     print r
     return
 
+
+def export_user_info():
+    book = Workbook()
+    sheet1 = book.worksheets[0]
+    all_user_data = get_all_user_data()
+    title_map = {'用户名': 'username',
+                 '电子邮件': 'email',
+                 '手机号码': 'tel',
+                 '客户单位': 'company',
+                 '年龄': 'age',
+                 '角色': 'role',
+                 '研究领域': 'field',
+                 '状态': 'status',
+                 '备注': 'notes'}
+    title_list = ['用户名', '电子邮件', '手机号码', '客户单位', '年龄', '角色', '研究领域', '状态']
+    for i, title in enumerate(title_list):
+        sheet1.cell(row=1, column=i + 1).value = title
+    for i, data in enumerate(all_user_data):
+        for j, title in enumerate(title_list):
+            sheet1.cell(row=i+2, column=j + 1).value = data.get(title_map[title])
+    export_path = os.path.dirname(__file__) + '/static/export/'
+    file_name = 'user_info_' + datetime.datetime.now().strftime("%Y%m%d%H%M%S") + '.xls'
+    full_file_name = os.path.join(export_path, file_name)
+    # remove old user info table
+    for name in os.listdir(export_path):
+        if 'user_info' in name:
+            os.remove(os.path.join(export_path, name))
+    book.save(filename=full_file_name)
+
+    return file_name
+
+
+def upload_project_file(io_stream, filename, project_id):
+    filename = filename.split('\\')[-1]
+    cmd = "select project_number,project_name from sample_project_master where id=%s" % project_id
+    results = DBConn().execute(cmd, get_all=False)
+    project_name = str(results[0])+'-'+results[1] if results else 'unknown_project'
+    upload_path = os.path.join(os.path.dirname(__file__), 'static/import/', project_name)
+    if not os.path.exists(upload_path):
+        os.makedirs(upload_path)
+    file_path = os.path.join(upload_path, filename)
+    # juge file whether has exist
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print "delete had exist file: %s" % filename
+    temp_file_path = file_path + '~'
+    output_file = open(temp_file_path, 'wb')
+    io_stream.seek(0)
+    while True:
+        data = io_stream.read(2 << 16)
+        if not data:
+            break
+        output_file.write(data)
+    output_file.flush()
+    output_file.close()
+    os.rename(temp_file_path, file_path)
+
+    return {'data': '', 'errcode': 0, 'msg': "upload ok!"}
+
 if __name__ == '__main__':
     # print transfer_excel_to_json('/home/chenjialin/下载/Table.1.xls')
-    info = {u'username': u'test', u'role': u'user', u'password': u'test', u'tel': u'test', u'e_mail': u'test'}
-    print save_user_info(info)
+    export_user_info()
