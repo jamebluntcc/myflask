@@ -242,11 +242,12 @@ def upload():
 
 @app.route('/upload_project_file', methods=['GET', 'POST'])
 def upload_project_file():
-    project_id = request.args.get('project_id')
+    project_name = request.args.get('project_name')
+    project_number = request.args.get('project_number')
     io_stream = request.files['file_data']
-    filename = secure_filename(io_stream.filename)
+    filename = io_stream.filename
     try:
-        ret = interface.upload_project_file(io_stream, filename, project_id)
+        ret = interface.upload_project_file(io_stream, filename, project_number, project_name)
     except Exception, e:
         import traceback
         traceback.print_exc()
@@ -261,7 +262,18 @@ def export_user_info():
 
 @app.route('/get_upload_page', methods=['GET', 'POST'])
 def get_upload_page():
-    return render_template('upload_project_file.html', project_id=1)
+    project_number = request.args.get('project_number')
+    project_name = request.args.get('project_name')
+    return render_template('upload_project_file.html', project_number=project_number, project_name=project_name)
+
+
+@app.route('/get_project_files', methods=['GET', 'POST'])
+def get_project_files():
+    project_number = request.args.get('project_number')
+    project_name = request.args.get('project_name')
+
+    return jsonify(interface.get_project_files(project_number, project_name))
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)

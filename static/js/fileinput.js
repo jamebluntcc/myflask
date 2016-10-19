@@ -1164,6 +1164,7 @@
             self.ajaxRequests.push($.ajax(settings));
         },
         initUploadSuccess: function (out, $thumb, allFiles) {
+            console.log('adfadfadf')
             var self = this, append, data, index, $newThumb, content, config, tags;
             if (typeof out !== 'object' || $.isEmptyObject(out)) {
                 return;

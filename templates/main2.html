@@ -272,41 +272,58 @@
         $("#self_info").hide();
         $("#detail").children().remove();
         $("#detail").append("<table id='show_all'></table>");
-        var table_title =  "所有的用户:（双击行可修改信息）<button onclick='export_user_info()'>导出用户数据</button>";
+        var table_title = "所有的用户:（双击行可修改信息）<button onclick='export_user_info()'>导出用户数据</button>";
         var status_list = {'Y': 'Y', 'R': 'R', 'N': 'N'};
         $("#show_all").jqGrid({
             datatype: 'local',
             height: 250,
-            colNames: ['用户名', '电子邮件', '手机号码', '客户单位' ,'年龄' ,'角色',
+            colNames: ['用户名', '电子邮件', '手机号码', '客户单位', '年龄', '角色',
                 '研究领域', '状态', ''],
             colModel: [
-                { name: 'username', index: 'username', width: 65, editable:false},
-                { name: 'email', index: 'email', width: 65, editable:false},
-                { name: 'tel', index: 'tel', width: 65, editable:false},
-                { name: 'company', index: 'company', width: 65, editable:false},
-                { name: 'age', index: 'age', width: 65, editable:false},
-                { name: 'role', index: 'role', width: 65, editable:false},
-                { name: 'field', index: 'field', width: 65, editable:false},
-                { name: 'status', index: 'status', width: 80, editable: true, edittype: 'select', editoptions: { value: status_list, maxLength: 20 }},
-/**                { name: 'notes', index: 'notes', width: 65, editable:true}, **/
-                { name: 'save', index: 'save', width: 120, hidden: false}
+                {name: 'username', index: 'username', width: 65, editable: false},
+                {name: 'email', index: 'email', width: 65, editable: false},
+                {name: 'tel', index: 'tel', width: 65, editable: false},
+                {name: 'company', index: 'company', width: 65, editable: false},
+                {name: 'age', index: 'age', width: 65, editable: false},
+                {name: 'role', index: 'role', width: 65, editable: false},
+                {name: 'field', index: 'field', width: 65, editable: false},
+                {
+                    name: 'status',
+                    index: 'status',
+                    width: 80,
+                    editable: true,
+                    edittype: 'select',
+                    editoptions: {value: status_list, maxLength: 20}
+                },
+            /**                { name: 'notes', index: 'notes', width: 65, editable:true}, **/
+                {name: 'save', index: 'save', width: 120, hidden: false}
             ],
-            ondblClickRow: function(rowid) {
+            ondblClickRow: function (rowid) {
                 var table_obj = $("#show_all");
                 table_obj.editRow(rowid);
-                $("#show_all").setCell(rowid, 'save', "<input type='button' onclick='save_userinfo_row("+ rowid +")' value='保存信息'></input>");
+                $("#show_all").setCell(rowid, 'save', "<input type='button' onclick='save_userinfo_row(" + rowid + ")' value='保存信息'></input>");
 
             },
             caption: table_title
         });
 
-        ajaxSend('get_all_user_data', {}, function(data) {
+        ajaxSend('get_all_user_data', {}, function (data) {
             var all_data = data['data'];
-            for (var i=0; i<=all_data.length;i++) {
-                $("#show_all").jqGrid('addRowData', i+1, all_data[i])
+            for (var i = 0; i <= all_data.length; i++) {
+                $("#show_all").jqGrid('addRowData', i + 1, all_data[i])
             }
         });
+    }
 
+    function show_upload_page(project_number, project_name) {
+        window.location.href='/get_upload_page?project_number='+project_number+'&project_name='+project_name;
+
+    }
+
+    function format_upload_button(cellvalue, options, rowObject) {
+        var project_number = rowObject['project_number'];
+        var project_name = rowObject['project_name'];
+        return "<button onclick='show_upload_page("+project_number+","+project_name+")'>项目文件</button>";
     }
 
     function show_my_project() {
@@ -338,7 +355,7 @@
                 { name: 'project_leader', index: 'project_leader', width: 80, editable:false},
                 { name: 'status', index: 'status', width: 80, editable: true, edittype: 'select', editoptions: { value: status_list, maxLength: 20 }},
                 { name: 'create_time', index: 'create_time', width: 120, editable:false},
-                { name: 'save', index: 'save', width: 120, hidden: false}
+                { name: 'action', index: 'action', width: 120, hidden: false, formatter:format_upload_button}
             ],
             ondblClickRow: function(rowid) {
                 var project_number = $("#show_all").getRowData(rowid)['project_number'];
@@ -418,7 +435,6 @@
 
     }
 
-
     function change_status() {
         var table_obj = $("#show_all");
         var ids = table_obj.getDataIDs();
@@ -440,7 +456,6 @@
         var username = table_obj.getCell(row_id, 'username');
         $("#show_all").saveRow(row_id, 'status', '/admin_save_user_info', {'username': username});
     }
-
 
     function export_user_info() {
         ajaxSend('/export_user_info', {}, function (filename) {

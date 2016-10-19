@@ -1,5 +1,6 @@
 #coding=utf-8
 import datetime
+import time
 import os
 import xlrd
 from openpyxl import Workbook
@@ -165,7 +166,8 @@ def show_all_data(username, role='user'):
     db = DBConn()
     result = db.execute(cmd)
     for i in result:
-        data.append(dict(i))
+        temp_dict = dict(i)
+        data.append(temp_dict)
 
     return data
 
@@ -519,12 +521,10 @@ def export_user_info():
     return file_name
 
 
-def upload_project_file(io_stream, filename, project_id):
+def upload_project_file(io_stream, filename, project_number, project_name):
     filename = filename.split('\\')[-1]
-    cmd = "select project_number,project_name from sample_project_master where id=%s" % project_id
-    results = DBConn().execute(cmd, get_all=False)
-    project_name = str(results[0])+'-'+results[1] if results else 'unknown_project'
-    upload_path = os.path.join(os.path.dirname(__file__), 'static/import/', project_name)
+    project_folder = project_number + '-' + project_name
+    upload_path = os.path.join(os.path.dirname(__file__), 'static/import/', project_folder)
     if not os.path.exists(upload_path):
         os.makedirs(upload_path)
     file_path = os.path.join(upload_path, filename)
@@ -546,6 +546,24 @@ def upload_project_file(io_stream, filename, project_id):
 
     return {'data': '', 'errcode': 0, 'msg': "upload ok!"}
 
+
+def get_project_files(project_number, project_name):
+    file_list = []
+    project_folder = project_number + '-' + project_name
+    project_folder_path = os.path.join(os.path.dirname(__file__), 'static/import/', project_folder)
+    files = os.listdir(project_folder_path)
+    for file_name in files:
+        file_path = os.path.join(project_folder_path, file_name)
+        stat_info = os.stat(file_path)
+        file_list.append({
+            'file_name': file_name,
+            'create_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat_info.st_ctime)),
+            'update_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat_info.st_mtime))
+        })
+
+    return {'data': file_list, 'errcode': 0, 'msg': ""}
+
+
 if __name__ == '__main__':
     # print transfer_excel_to_json('/home/chenjialin/下载/Table.1.xls')
-    export_user_info()
+    print get_project_files('111', '111')
