@@ -551,6 +551,8 @@ def get_project_files(project_number, project_name):
     file_list = []
     project_folder = project_number + '-' + project_name
     project_folder_path = os.path.join(os.path.dirname(__file__), 'static/import/', project_folder)
+    if not os.path.exists(project_folder_path):
+        return {'data': [], 'errcode': 0, 'msg': ""}
     files = os.listdir(project_folder_path)
     for file_name in files:
         file_path = os.path.join(project_folder_path, file_name)

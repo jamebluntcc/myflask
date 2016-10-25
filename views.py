@@ -1,4 +1,4 @@
-#coding=utf-8
+# coding=utf-8
 from flask import Flask, render_template, redirect, request, jsonify, session
 from datetime import timedelta
 from werkzeug.utils import secure_filename
@@ -256,7 +256,6 @@ def upload_project_file():
 
 @app.route('/export_user_info', methods=['GET', 'POST'])
 def export_user_info():
-
     return interface.export_user_info()
 
 

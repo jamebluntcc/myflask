@@ -341,7 +341,7 @@
             datatype: 'local',
             height: 250,
             colNames: ['项目编号', '项目名称', '客户单位', '客户姓名', 'E-mail' ,'联系电话' ,'销售姓名',
-                '送样日期', '样本数量', '项目负责人', '项目状态', '创建时间', ''],
+                '送样日期', '样本数量', '项目负责人', '项目状态', '创建时间', '', ''],
             colModel: [
                 { name: 'project_number', index: 'project_number', width: 65, editable:false},
                 { name: 'project_name', index: 'project_name', width: 65, editable:false},
@@ -355,6 +355,7 @@
                 { name: 'project_leader', index: 'project_leader', width: 80, editable:false},
                 { name: 'status', index: 'status', width: 80, editable: true, edittype: 'select', editoptions: { value: status_list, maxLength: 20 }},
                 { name: 'create_time', index: 'create_time', width: 120, editable:false},
+                { name: 'save', index: 'save', width: 120, editable:false},
                 { name: 'action', index: 'action', width: 120, hidden: false, formatter:format_upload_button}
             ],
             ondblClickRow: function(rowid) {
