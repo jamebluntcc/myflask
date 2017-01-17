@@ -3,6 +3,7 @@ from flask import Flask, render_template, redirect, request, jsonify, session
 from datetime import timedelta
 from werkzeug.utils import secure_filename
 import interface
+from validate_code import get_validate_code
 import json
 import sys
 
@@ -145,6 +146,16 @@ def change_password():
     return jsonify(data)
 
 
+@app.route('/validate_code', methods=['GET', 'POST'])
+def validate_code():
+    try:
+        code = get_validate_code()
+    except Exception, e:
+        print e
+
+    return code
+
+
 @app.route('/get_all_data', methods=['GET', 'POST'])
 def get_all_data():
     username = session.get('login_id')
@@ -275,4 +286,4 @@ def get_project_files():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=50000, debug=False)
