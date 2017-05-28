@@ -42,8 +42,11 @@
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<ul class="nav navbar-nav">
                         {% if role=='user' %}
-                            <li><a href="/input_info">新建项目</a></li>
+                            <li>
+                                <a onclick="$('#page_detail').render('/get_input_info')">新建项目</a>
+                            </li>
                             <li><a href="/select_project">数据分析</a></li>
+                            <li><a onclick="$('#page_detail').render('/get_sample_page');">新建样品信息表</a></li>
                         {% elif role=='manager' %}
                             <li>
                                 <a href="#" onclick="$('#selected_project_div').show();$('#selected_project')[0].selectedIndex=0;$('#detail').empty();" >查看项目分析数据</a>
@@ -105,7 +108,7 @@
                                 </li>
                                 <li>
                                     <a>工作单位</a>
-							        <input type="text" id="company" placeholder="用户所在单位" style="width: 200px"  value="{{ company }}">
+							        <input type="text" id="company" placeholder="所在单位" style="width: 200px"  value="{{ company }}">
                                 </li>
                                 <li>
                                     <a>工作领域</a>
@@ -155,57 +158,57 @@
 				</div>
 			</div>
 
-
-            <div id="self_info" class="jumbotron" style="padding-bottom: 150px">
-                <h2>个人信息</h2>
-                <p>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">用户名</label>
-                        <div class="col-sm-10">
-                            <label class="col-sm-2 control-label">{{ username }}</label>
+            <div id="page_detail">
+                <div id="self_info" class="jumbotron" style="padding-bottom: 150px">
+                    <h2>个人信息</h2>
+                    <p>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">用户名</label>
+                            <div class="col-sm-10">
+                                <label class="col-sm-2 control-label">{{ username }}</label>
+                            </div>
                         </div>
-                    </div>
-                     <div class="form-group">
-                        <label class="col-sm-2 control-label">姓名</label>
-                        <div class="col-sm-10">
-                            <label class="col-sm-2 control-label">{{ customer_name or '未填写'}}</label>
+                         <div class="form-group">
+                            <label class="col-sm-2 control-label">姓名</label>
+                            <div class="col-sm-10">
+                                <label class="col-sm-2 control-label">{{ customer_name or '未填写'}}</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">Email</label>
-                        <div class="col-sm-10">
-                        <label class="col-sm-2 control-label">{{ e_mail }}</label>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Email</label>
+                            <div class="col-sm-10">
+                            <label class="col-sm-2 control-label">{{ e_mail }}</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">电话号码</label>
-                        <div class="col-sm-10">
-                        <label class="col-sm-2 control-label">{{ tel }}</label>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">电话号码</label>
+                            <div class="col-sm-10">
+                            <label class="col-sm-2 control-label">{{ tel }}</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">工作单位</label>
-                        <div class="col-sm-10">
-                        <label class="col-sm-2 control-label">{{ company or '未填写' }}</label>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">工作单位</label>
+                            <div class="col-sm-10">
+                            <label class="col-sm-2 control-label">{{ company or '未填写' }}</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">工作领域</label>
-                        <div class="col-sm-10">
-                        <label class="col-sm-2 control-label">{{ field or '未填写'}}</label>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">工作领域</label>
+                            <div class="col-sm-10">
+                            <label class="col-sm-2 control-label">{{ field or '未填写'}}</label>
+                            </div>
                         </div>
-                    </div>
-                </p>
-            </div>
-            <div id="selected_project_div" hidden>
-                <a>选择数据项目: </a>
-                <select id="selected_project" onchange="show_render()">
-                    {% for option in project_num_list %}
-                        <option value ="{{ option }}">{{ option }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-			<div class="jumbotron" id="detail">
+                    </p>
+                </div>
+                <div id="selected_project_div" hidden>
+                    <a>选择数据项目: </a>
+                    <select id="selected_project" onchange="show_render()">
+                        {% for option in project_num_list %}
+                            <option value ="{{ option }}">{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="jumbotron" id="detail">
 				<h1>欢迎登录建库信息系统</h1>
 				<p>
 					在系统中，您可以点击上面的“新建项目”，跳转到新页面，然后提供给我们您的基本信息，您也可以通过点击“数据分析” 提供给我们您的样品分组信息和差异比较方案，我们将最近根据您提供的信息尽快分析得出结果。
@@ -215,6 +218,7 @@
 					 <a class="btn btn-primary btn-large" href="http://www.onmath.cn/">了解更多</a>
 				</p>
 			</div>
+            </div>
 		</div>
 	</div>
 </div>

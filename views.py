@@ -175,19 +175,27 @@ def get_all_user_data():
     return jsonify({'data': data, 'errcode': 0, 'msg': 'Success'})
 
 
-@app.route('/input_info')
-def input_info():
+@app.route('/get_input_info', methods=['GET', 'POST'])
+def get_input_info():
     username = session.get('login_id')
-    if not username:
-        return redirect('/login')
-    user_role, status = interface.get_user_role(username)
-    action = request.args.get('action')
-    action = 'new' if not action else action
-    project_number = request.args.get('project_number')
-    data = interface.get_one_project_data(project_number) if project_number else {}
-    manager_list = interface.get_manager_list()
 
-    return render_template('user_input.html', data=data, action=action, role=user_role, manager_list=manager_list)
+
+    # if not username:
+    #     return redirect('/login')
+    # user_role, status = interface.get_user_role(username)
+    # action = request.args.get('action')
+    # action = 'new' if not action else action
+    # project_number = request.args.get('project_number')
+    # data = interface.get_one_project_data(project_number) if project_number else {}
+    # manager_list = interface.get_manager_list()
+    #
+    # return render_template('user_input.html', data=data, action=action, role=user_role, manager_list=manager_list)
+    return render_template('information_sheet.html')
+
+
+@app.route('/save_sample_row', methods=['GET', 'POST'])
+def save_sample_row():
+    return jsonify({'data': [], 'errcode': 0, 'msg': 'Success'})
 
 
 @app.route('/get_detail_sample_data', methods=['GET', 'POST'])
@@ -277,6 +285,12 @@ def get_upload_page():
     return render_template('upload_project_file.html', project_number=project_number, project_name=project_name)
 
 
+@app.route('/get_sample_page', methods=['GET', 'POST'])
+def get_sample_page():
+    project_id = 1
+    return render_template('sample.html', project_id=project_id)
+
+
 @app.route('/get_project_files', methods=['GET', 'POST'])
 def get_project_files():
     project_number = request.args.get('project_number')
@@ -286,4 +300,4 @@ def get_project_files():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=50000, debug=False)
+    app.run(host='0.0.0.0', port=5000, debug=False)
