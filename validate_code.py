@@ -2,10 +2,9 @@
 # coding=utf-8
 import random
 import os
-import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
-fontType = "/home/jedrek/work_dir/my_project/myflask/FZZCHJW.TTF"
-
+fontType = os.path.join(os.path.dirname(__file__),"FZZCHJW.TTF")
 
 def create_validate_code(size=(120, 30),
                          chars='abcdefghjkmnpqrstuvwxyABCDEFGHJKMNPQRSTUVWXY3456789',

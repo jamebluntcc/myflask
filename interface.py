@@ -4,8 +4,8 @@ import time
 import os
 import xlrd
 from openpyxl import Workbook
-
 from db import DBConn
+from werkzeug.security import generate_password_hash,check_password_hash
 
 table1_map = {
     '任单编号': 'any_single_num',
@@ -227,20 +227,28 @@ def phone_check(s):
 
     return True if len(s) == 11 and s.isdigit() and s[:3] in phone_prefix else False
 
-
+'''
+changed by chencheng on 2017-06-01 add password hash
+'''
 def get_user_role(username, password=''):
     db = DBConn()
     if phone_check(username):
-        cmd = "select role,status from user_info where tel='%s'" % username
+        cmd = "select role,status,password from user_info where tel='%s'" % username
     else:
-        cmd = "select role,status from user_info where username='%s'" % username
-    if password:
-        cmd += " and password='%s'" % password
+        cmd = "select role,status,password from user_info where username='%s'" % username
     result = db.execute(cmd, get_all=False)
-    role = result[0] if result else ''
-    status = result[1] if result else ''
-    return role, status
-
+    password_hash = result[2] if result else ''
+    if password:
+        if check_password_hash(password_hash,password):
+            role = result[0] if result else ''
+            status = result[1] if result else ''
+            return role, status
+        else:
+            return ('','')
+    else:
+        role = result[0] if result else ''
+        status = result[1] if result else ''
+        return role, status
 
 def get_other_info(username):
     db = DBConn()
@@ -273,11 +281,12 @@ def change_password(info):
     db = DBConn()
     cmd = "select password from user_info where username='%s'" % username
     result = db.execute(cmd, get_all=False)
-    if result and result[0] == info['old_passwd'] and info['new_passwd'] != info['old_passwd']:
-        db.update('user_info', {'username': username}, {'password': info['new_passwd'],
+    if result and check_password_hash(result[0],info['old_passwd']) and info['new_passwd'] != info['old_passwd']:
+        password_hash = generate_password_hash(info['new_passwd'])
+        db.update('user_info', {'username': username}, {'password': password_hash,
                                                         'update_time': datetime.datetime.now()})
         return {'data': '', 'errcode': 0, 'msg': '更新成功！'}
-    elif result and result[0] != info['old_passwd']:
+    elif result and check_password_hash(result,info['old_password']):
         return {'data': '', 'errcode': 1, 'msg': '旧密码错误！'}
     elif info['new_passwd'] == info['old_passwd']:
         return {'data': '', 'errcode': 1, 'msg': '新密码和旧密码不能一样！'}
@@ -312,6 +321,8 @@ def save_user_info(info):
     elif tel_result:
         ret = fail_info(tel_result, '电话号码')
     else:
+        hash_password = generate_password_hash(info.get('password'))
+        info['password'] = hash_password
         db.insert('user_info', info)
         ret = {'data': '', 'errcode': 0, 'msg': '注册成功：等待审核！'}
 
@@ -564,8 +575,9 @@ def get_project_files(project_number, project_name):
         })
 
     return {'data': file_list, 'errcode': 0, 'msg': ""}
-
-
+'''
+add generate hash function by chencheng on 2017-05-31
+'''
 if __name__ == '__main__':
     # print transfer_excel_to_json('/home/chenjialin/下载/Table.1.xls')
     print get_project_files('111', '111')
