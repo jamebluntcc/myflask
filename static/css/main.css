@@ -497,3 +497,5 @@ span[name="Life Cycle"] a {
     overflow-x: hidden;
     overflow-y: auto;
 }
+
+.tipsover{ background-color:#54c11a !important; color:#fff; }
