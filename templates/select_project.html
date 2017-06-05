@@ -5,11 +5,11 @@
     <title>选择项目录入分析数据</title>
 </head>
 <body>
-    <span>选择项目：</span>
+    <span>请选择您的项目：</span>
     <select id="selected_project" onchange="show_render()">
         <option value =""></option>
-        {% for option in project_list %}
-            <option value ="{{ option }}">{{ option }}</option>
+        {% for key,value in project_info.items() %}
+            <option value ="{{ key }}">{{ value }}</option>
         {% endfor %}
     </select>
     <div id="detail" class="detail"></div>

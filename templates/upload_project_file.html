@@ -41,6 +41,7 @@
 
     var project_number = "{{ project_number }}";
     var project_name = "{{ project_name }}";
+    var project_id = "{{ project_id }}";
     $("#file-1").fileinput({
         uploadUrl: '/upload_project_file?project_number={{ project_number }}&project_name={{ project_name }}', // you must set a valid URL here else you will get an error
         allowedFileExtensions : ['jpg', 'png','gif', 'xlsx'],

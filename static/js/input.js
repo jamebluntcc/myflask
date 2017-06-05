@@ -277,7 +277,7 @@ $(document).ready(function(){
         var jq_obj = $("#input_detail_info");
         var ids= jq_obj.getDataIDs();
         for (var i in ids) {
-            jq_obj .saveRow(ids[i], '', 'save_row');
+            jq_obj.saveRow(ids[i], '', 'save_row');
         }
     });
 
