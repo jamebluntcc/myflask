@@ -7,74 +7,139 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}">
 </head>
 <body>
-<div class="box">
-<div class="login-box">
-<div class="login-title text-center">
-<h1><small>登录</small></h1>
-</div>
-<div class="login-content ">
-<div class="form">
-<form action="#" method="post">
-<div class="form-group">
-    <div class="col-xs-12  ">
-            <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
-                    <input type="text" id="username" name="username" class="form-control" placeholder="用户名">
+    <div>
+        <div class="login-box">
+            <div class="login-title text-center">
+                <h1><small>登录</small></h1>
             </div>
-    </div>
-</div>
-<div class="form-group">
-    <div class="col-xs-12  ">
-            <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
-                    <input type="password" id="password" name="password" class="form-control" placeholder="密码">
-            </div>
-    </div>
-</div>
+            <br/><br/>
+            <div class="login-content " align="center">
+                <div class="form" align="center">
+                    <form action="#" method="post" align="center">
+                            <div class="col-xs-3  " align="center" style="float: unset;margin:0 auto;">
+                                <div class="input-group" >
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-user"></span>
+                                    </span>
+                                    <input type="text" id="username" name="username" class="form-control" placeholder="用户名/手机号码" >
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-lock"></span>
+                                    </span>
+                                    <input type="password" id="password" name="password" class="form-control" placeholder="密码">
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-send"></span>
+                                    </span>
+                                    <input type="validate_code" id="validate_code" name="validate_code" class="form-control"  placeholder="验证码">
+                                </div>
+                                <div>
+                                    <a class="code_s"></a>
+                                    <a onclick="get_validate_code();">换一张</a>
+                                </div>
+                            </div>
 
-<div class="form-group form-actions">
-    <div class="col-xs-4">
-        <br>
-        <section><label><input type="checkbox" name="rememberme" id="rememberme"/>记住密码</label></section>
-{#        <button class="btn btn-sm btn-info" onclick="login_in()"><span class="glyphicon glyphicon-off"></span> 登录</button>#}
-        <section class="span1"><input type="button" value="登录" onclick="login_in()" class="btn btn-primary"></section>
-        <p class="text-center remove-margin"><small>忘记密码？</small> <a href="javascript:alert('请联系管理员陈中旭获取密码：18628264390')" ><small>找回</small></a></p>
-        <p class="text-center remove-margin"><small>还没注册?</small> <a href="/register" ><small>注册</small></a></p>
+                        <div class="form-group form-actions">
+                            <div class="col-xs-12">
+                                <br>
+                                <section>
+                                    <label><input type="checkbox" name="rememberme" id="rememberme"/>记住密码</label>
+                                </section>
+                                <section class="span1">
+                                    <input type="button" value="登录" onclick="login_in()" class="btn btn-primary">
+                                </section>
+				<br>
+                                <p class="text-center remove-margin">
+                                    <small>忘记密码？</small>
+                                    <a href="javascript:alert('请联系管理员获取密码: it@onmath.cn')" >
+                                        <small>找回</small>
+                                    </a>
+                                </p>
+                                <p class="text-center remove-margin">
+                                    <small>还没注册?</small>
+                                    <a href="/register" >
+                                        <small>注册</small>
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-</div>
-</form>
-</div>
-</div>
-</div>
-</div>
+    <div id="show_qr_code" align="center">
+        <p align="center">您可以在手机端浏览本网站，扫描二维码进入：</p>
+        <img src="/static/image/qr_code.png" title="请用手机扫一扫！"/>
+    </div>
 </body>
 <script src="/static/js/jquery-2.0.0.min.js"></script>
 <script src="/static/js/jquery.cookie.js"></script>
 <script src="/static/js/main.js"></script>
 <script>
-function login_in(){
-    var username = $("#username").val();
-    var password = $("#password").val();
+    var validate_code = '';
 
-    if($("#rememberme").prop('checked')) {
-        $.cookie("rmbUser", "true", {expires: 7});
-        $.cookie("username", username, {expires: 7});
-        $.cookie("password", password, {expires: 7});
-    } else {
-        $.cookie("rmbUser", "false", {expires: -1});
-        $.cookie("username", "", {expires: -1});
-        $.cookie("password", "", {expires: -1});
+    try {
+            var urlhash = window.location.hash;
+            if (!urlhash.match("fromapp")){
+                if ((navigator.userAgent.match(/(iPhone|iPod|Android|ios|iPad)/i))){
+                    $("#show_qr_code").hide();
+                    $(".col-xs-3")[0].className='col-xs-12';
+                }
+            }
+        }
+    catch(err)
+        {}
+
+    function get_validate_code() {
+        ajaxSend('/validate_code', {}, function(data){
+            validate_code = data;
+            $(".code_s").children().remove();
+            $(".code_s").append("<img id='validate_code_s' src='static/code_img/"+ validate_code +".gif'/>");
+        });
     }
 
-    ajaxSend('/check_login', {"username":username, "password":password}, function(data){
-        console.log(data);
-        if (data.errcode == 0) {
-            window.location.href='/';
-        } else {
-            alert(data.msg);
+    function login_in(){
+        var username = $("#username").val();
+        var password = $("#password").val();
+        var input_validate = $("#validate_code").val();
+        if (input_validate.length==0) {
+            alert("请输入验证码！");
+            return;
         }
+        else if (input_validate.toLowerCase() != validate_code.toLowerCase()) {
+            alert("验证码错误！");
+            get_validate_code();
+            return;
+        }
+
+        if($("#rememberme").prop('checked')) {
+            $.cookie("rmbUser", "true", {expires: 7});
+            $.cookie("username", username, {expires: 7});
+            $.cookie("password", password, {expires: 7});
+        } else {
+            $.cookie("rmbUser", "false", {expires: -1});
+            $.cookie("username", "", {expires: -1});
+            $.cookie("password", "", {expires: -1});
+        }
+
+        ajaxSend('/check_login', {"username":username, "password":password}, function(data){
+            if (data.errcode == 0) {
+                window.location.href='/';
+                $.cookie('username', username);
+            } else {
+                alert(data.msg);
+                get_validate_code();
+            }
+        });
+    }
+
+
+    $(document).ready(function(){
+        get_validate_code();
     });
-}
+
 </script>
 </html>

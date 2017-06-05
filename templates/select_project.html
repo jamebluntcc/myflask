@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>选择项目录入分析数据</title>
+</head>
+<body>
+    <span>请选择您的项目：</span>
+    <select id="selected_project" onchange="show_render()">
+        <option value =""></option>
+        {% for key,value in project_info.items() %}
+            <option value ="{{ key }}">{{ value }}</option>
+        {% endfor %}
+    </select>
+    <div id="detail" class="detail"></div>
+</body>
+<script src="/static/js/jquery-2.0.0.min.js"></script>
+<script src="/static/js/jquery.jqGrid.src.js/"></script>
+<script src="/static/js/main.js"></script>
+</html>
