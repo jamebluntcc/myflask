@@ -17,18 +17,25 @@ class DBConn(object):
         db_name (str): Default=SEQ_SA_INFO
     """
 
-    def __init__(self, db_name='SEQ_SA_INFO'):
+    def __init__(self, db_name='SEQ_SA_INFO', auto_commit=True):
         self._db_name = db_name
         self._engine = self._get_engine()
         self._connection = self._engine.connect()
-        self._transaction = self._connection.begin()
+        if not auto_commit:
+            self._transaction = self._connection.begin()
 
     def __del__(self):
-        self._transaction.commit()
-        self._connection.close()
+        if self._connection:
+            self._connection.close()
 
     def get_connect(self):
         return self._connection
+
+    def roll_back(self):
+        self._transaction.rollback()
+
+    def commit(self):
+        self._transaction.commit()
 
     def _get_engine(self):
         engine = create_engine('mysql+pymysql://{user}:{pass_wd}@{host}/{db}?charset={charset}'.format(

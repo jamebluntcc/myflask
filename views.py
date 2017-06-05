@@ -22,16 +22,16 @@ def main():
         return redirect('/login')
     user_role, status = interface.get_user_role(username)
     (e_mail, tel, company, field, customer_name) = interface.get_other_info(username)
-    project_num_list = ['']
-    project_num_list += interface.get_project_number_list(username, user_role)
-    return render_template('main2.html', username=username,
+    project_info = interface.get_project_number_list(username, user_role)
+    project_info[''] = ''
+    return render_template('main.html', username=username,
                            role=user_role,
                            e_mail=e_mail,
                            tel=tel,
                            company=company,
                            customer_name=customer_name,
                            field=field,
-                           project_num_list=project_num_list)
+                           project_info=project_info)
 
 
 @app.route('/save_input', methods=['GET'])
@@ -46,16 +46,22 @@ def save_info():
     return jsonify(interface.save_info(all_info, username, action))
 
 
-@app.route('/save_compare_input', methods=['GET'])
+@app.route('/save_compare_input', methods=['POST'])
 def save_compare_input():
-    selected_project = request.args.get('selected_project')
-    username = session.get('login_id')
-    if not username:
-        return redirect('/login')
-    all_info = request.args.get('all_info')
-    all_info = json.loads(all_info)
+    try:
+        project_id = request.form['selected_project']
+        username = session.get('login_id')
+        if not username:
+            return redirect('/login')
 
-    return jsonify(interface.save_compare_input(all_info, username, selected_project))
+        all_info = request.form['all_info']
+        all_info = json.loads(all_info)
+
+        return jsonify(interface.save_compare_input(all_info, username, project_id))
+    except Exception, e:
+        print e
+        import traceback
+        traceback.print_exc()
 
 
 @app.route('/login', methods=['GET'])
@@ -105,10 +111,12 @@ def analysis():
     user_role, status = interface.get_user_role(username)
     data = interface.get_analysis_data(username, user_role, selected_project)
     action = 'update' if data else 'new'
-    project_list = interface.get_project_number_list(username, user_role)
     data['selected_project'] = selected_project
-    return render_template('analysis.html', data=data, action=action,
-                           project_list=project_list, selected_project=selected_project)
+    sample_list = interface.get_sample_list_by_project(selected_project)
+    return render_template('analysis.html', data=data,
+                           action=action,
+                           selected_project=selected_project,
+                           sample_list=sample_list)
 
 
 @app.route('/register', methods=['GET'])
@@ -210,11 +218,21 @@ def get_detail_sample_data():
 
 @app.route('/get_analysis_table_data', methods=['GET', 'POST'])
 def get_analysis_table_data():
-    selected_project = request.args.get('selected_project')
+    project_id = request.args.get('selected_project')
     username = session.get('login_id')
     if not username:
         return redirect('/login')
-    data = interface.get_analysis_table_data(username, selected_project)
+    data = interface.get_analysis_table_data(project_id)
+    return jsonify({'data': data, 'errcode': 0, 'msg': 'Success'})
+
+
+@app.route('/get_sample_table_data', methods=['GET', 'POST'])
+def get_sample_table_data():
+    project_id = request.args.get('project_id')
+    username = session.get('login_id')
+    if not username:
+        return redirect('/login')
+    data = interface.get_sample_table_data(project_id)
     return jsonify({'data': data, 'errcode': 0, 'msg': 'Success'})
 
 
@@ -246,9 +264,9 @@ def select_project():
     if not username:
         return redirect('/login')
     user_role, status = interface.get_user_role(username)
-    project_list = interface.get_project_number_list(username, user_role)
+    project_info = interface.get_project_number_list(username, user_role)
 
-    return render_template('select_project.html', project_list=project_list)
+    return render_template('select_project.html', project_info=project_info)
 
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -280,15 +298,25 @@ def export_user_info():
 
 @app.route('/get_upload_page', methods=['GET', 'POST'])
 def get_upload_page():
-    project_number = request.args.get('project_number')
-    project_name = request.args.get('project_name')
-    return render_template('upload_project_file.html', project_number=project_number, project_name=project_name)
+    project_id = request.args.get('project_id')
+    project_info = interface.get_project_info(project_id)
+    return render_template('upload_project_file.html', project_number=project_info['project_number'],
+                           project_name=project_info['project_name'], project_id=project_id)
 
 
 @app.route('/get_sample_page', methods=['GET', 'POST'])
 def get_sample_page():
-    project_id = 1
-    return render_template('sample.html', project_id=project_id)
+    try:
+        project_id = 1
+        return render_template('sample.html', project_id=project_id)
+    except Exception, e:
+        import traceback
+        traceback.print_exc()
+
+
+# @app.route('/test_page', methods=['GET', 'POST'])
+# def test_page():
+#     return render_template('.html', project_id=project_id)
 
 
 @app.route('/get_project_files', methods=['GET', 'POST'])
@@ -297,6 +325,20 @@ def get_project_files():
     project_name = request.args.get('project_name')
 
     return jsonify(interface.get_project_files(project_number, project_name))
+
+
+@app.route('/save_sample_table', methods=['POST'])
+def save_sample_table():
+    try:
+        data = request.form['sample_table_data']
+        data = json.loads(data) if data else []
+        project_id = request.form['project_id']
+        interface.save_simple_data(project_id, data)
+    except Exception, e:
+        import traceback
+        traceback.print_exc()
+
+    return jsonify({'data': '保存成功!', 'errcode': 0, 'msg': 'Success'})
 
 
 if __name__ == '__main__':

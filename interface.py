@@ -53,31 +53,44 @@ def get_project_id_by_num(db_instance, project_number):
     return result[0]
 
 
-def get_project_log_by_num(db_instance, project_number):
-    cmd = "select project_log from sample_project_master where project_number=%s" % project_number
+def get_project_log_by_num(db_instance, project_id):
+    cmd = "select project_log from sample_project_master where id=%s" % project_id
     result = db_instance.execute(cmd, get_all=False)
 
     return result[0] or ''
 
 
-def save_compare_text(selected_project, compare_data):
+def save_compare_text(project_id, all_info, current_time):
     try:
-        file_name = os.path.dirname(__file__) + '/static/export/' + selected_project + '.txt'
-        fd = open(file_name, 'w+')
-        for data in compare_data:
-            fd.write(data['comparison_name'] + '\n')
+        db = DBConn()
+        result = db.execute("select project_name from sample_project_master where id=%s" % project_id, get_all=False)
+        project_name = result[0]
+        project_dir = os.path.join(os.path.dirname(__file__), 'static/export/' + project_name)
+        if not os.path.exists(project_dir):
+            os.mkdir(project_dir)
+        group_file_name = os.path.join(project_dir, 'sample_inf' + current_time + '.txt')
+        compare_file_name = os.path.join(project_dir, 'group_compare' + current_time + '.txt')
+        sample_packet_information = all_info['sample_packet_information']
+        compare_table = all_info['compare_table']
+        fd_group_file = open(group_file_name, 'w+')
+        fd_compare_file = open(compare_file_name, 'w+')
+        fd_group_file.write(all_info['reference_genome'] + '\n')
+        for row in sample_packet_information:
+            fd_group_file.write(row['sample_group'] + '\t' + row['sample_name'] + '\n')
 
-        fd.close()
+        for row in compare_table:
+            fd_compare_file.write(row['comparison_name'] + '\t' + row['sample_group1'] + '\t' + row['sample_group2'] + '\n')
+        fd_group_file.close()
+        fd_compare_file.close()
     except Exception, e:
         print e
 
 
-def save_compare_input(all_info, username, selected_project, action='new'):
-    time = datetime.datetime.now()
+def save_compare_input(all_info, username, project_id, action='new'):
+    current_time = datetime.datetime.now()
+    save_compare_text(project_id, all_info, str(current_time))
     db_instance = DBConn()
-    project_number = selected_project.split('-')[-1]
-    project_id = get_project_id_by_num(db_instance, project_number)
-    project_log = get_project_log_by_num(db_instance, project_number)
+    project_log = get_project_log_by_num(db_instance, project_id)
     all_info['project_id'] = project_id
     cmd = "select id from analysis_master where created_by='%s' and project_id=%s" % (username, project_id)
     result = db_instance.execute(cmd, get_all=False)
@@ -91,15 +104,15 @@ def save_compare_input(all_info, username, selected_project, action='new'):
     del all_info['sample_packet_information']
     del all_info['compare_table']
     all_info['updated_by'] = username
-    all_info['update_time'] = time
+    all_info['update_time'] = current_time
     if action == 'new':
-        all_info['create_time'] = time
+        all_info['create_time'] = current_time
         all_info['created_by'] = username
         master_id = db_instance.insert('analysis_master', all_info)
-        project_log += '\n%s: %s created compare method.\n' % (time, username)
+        project_log += '\n%s: %s created compare method.\n' % (current_time, username)
         db_instance.update('sample_project_master', {'id': project_id}, {'project_log': project_log})
     else:
-        project_log += '\n%s: %s update compare method.\n' % (time, username)
+        project_log += '\n%s: %s update compare method.\n' % (current_time, username)
         db_instance.update('sample_project_master', {'id': project_id}, {'project_log': project_log})
         db_instance.update('analysis_master', {'id': master_id}, all_info)
     for row in sample_packet_information:
@@ -111,8 +124,6 @@ def save_compare_input(all_info, username, selected_project, action='new'):
         del row['id']
         row['master_id'] = master_id
         db_instance.insert('compare_table', row)
-
-    save_compare_text(selected_project, compare_table)
 
     msg = '更新成功！' if action == 'update' else '保存成功!'
     return {'data': '', 'errcode': 0, 'msg': msg}
@@ -209,13 +220,11 @@ def get_one_project_data(project_number):
     return data
 
 
-def get_analysis_data(username, role, selected_project):
+def get_analysis_data(username, role, project_id):
 
-    if not selected_project:
+    if not project_id:
         return {}
-    project_number = selected_project.split('-')[-1]
-    cmd = """select a.* from analysis_master a,sample_project_master s
-          where a.project_id=s.id and s.project_number=%s""" % project_number
+    cmd = """select * from analysis_master where project_id=%s""" % project_id
     db = DBConn()
     result = db.execute(cmd, get_all=False)
     return dict(result) if result else {}
@@ -341,11 +350,9 @@ def get_detail_sample_data(project_number):
     return data
 
 
-def get_analysis_table_data(username, selected_project):
+def get_analysis_table_data(project_id):
     data = {}
     db = DBConn()
-    project_number = selected_project.split('-')[-1]
-    project_id = get_project_id_by_num(db, project_number)
     cmd = """select info.* from sample_packet_information info, analysis_master m
                   where m.id=info.master_id and m.project_id=%s""" % project_id
     results = db.execute(cmd)
@@ -370,14 +377,17 @@ def admin_save_user_info(username, status):
 
 def get_project_number_list(username, user_role):
     if user_role == 'manager':
-        cmd = "select concat(project_name, '-', project_number) from sample_project_master where project_leader='%s'" % username
+        cmd = "select id, concat(project_name, '-', project_number) from sample_project_master where project_leader='%s'" % username
     elif user_role == 'user':
-        cmd = "select concat(project_name, '-', project_number) from sample_project_master where created_by='%s'" % username
+        cmd = "select id, concat(project_name, '-', project_number) from sample_project_master where created_by='%s'" % username
 
     db = DBConn()
     results = db.execute(cmd)
+    data = {}
+    for result in results:
+        data[result[0]] = result[1]
 
-    return [i[0] for i in results]
+    return data
 
 
 def get_manager_list():
@@ -575,9 +585,52 @@ def get_project_files(project_number, project_name):
         })
 
     return {'data': file_list, 'errcode': 0, 'msg': ""}
-'''
-add generate hash function by chencheng on 2017-05-31
-'''
+
+def save_simple_data(project_id, data):
+    try:
+        table_name = "sample_table"
+        db = DBConn()
+        db.delete(table_name, {'project_id': project_id})
+        for row in data:
+            row['project_id'] = project_id
+            db.insert(table_name, row)
+        ret = {'data': '', 'errcode': 0, 'msg': ''}
+    except Exception, e:
+        import traceback
+        traceback.print_exc()
+        ret = {'data': '', 'errcode': 1, 'msg': '%s DB issue!' % e}
+
+    return ret
+
+
+def get_sample_list_by_project(project_id):
+    sample_list = {}
+    db = DBConn()
+    cmd = "SELECT id_alias,sample_name FROM SEQ_SA_INFO.sample_info_detail where project_id=%s" % project_id
+    results = db.execute(cmd)
+    for result in results:
+        sample_list[result[0]] = result[1]
+
+    return sample_list
+
+
+def get_sample_table_data(project_id):
+    all_project_sample_data = []
+    db = DBConn()
+    cmd = "SELECT * FROM SEQ_SA_INFO.sample_table where project_id=%s" % project_id
+    results = db.execute(cmd)
+    for result in results:
+        all_project_sample_data.append(dict(result))
+
+    return all_project_sample_data
+
+
+def get_project_info(project_id):
+    db = DBConn()
+    cmd = "SELECT project_name, project_number FROM sample_project_master where id=%s" % project_id
+    result = db.execute(cmd, get_all=False)
+
+    return dict(result)
+
 if __name__ == '__main__':
-    # print transfer_excel_to_json('/home/chenjialin/下载/Table.1.xls')
     print get_project_files('111', '111')
