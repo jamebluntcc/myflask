@@ -254,3 +254,8 @@ ALTER TABLE `SEQ_SA_INFO`.`compare_table`
 CHANGE COLUMN `sample1` `sample_group1` VARCHAR(45) NULL DEFAULT '' ,
 CHANGE COLUMN `sample2` `sample_group2` VARCHAR(45) NULL DEFAULT '' ;
 
+ALTER TABLE `SEQ_SA_INFO`.`user_info` 
+CHANGE COLUMN `password` `password` VARCHAR(200) NOT NULL ;
+
+ALTER TABLE `SEQ_SA_INFO`.`sample_project_master` 
+CHANGE COLUMN `project_number` `project_number` VARCHAR(45) NOT NULL ;
