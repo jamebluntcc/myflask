@@ -43,12 +43,13 @@
 					<ul class="nav navbar-nav">
                         {% if role=='user' %}
                             <li>
-                                <a onclick="$('#page_detail').render('/get_input_info')">新建项目</a>
+                                <!--<a onclick="$('#page_detail').render('/get_input_info')">新建项目</a>-->
+                                <a onclick="$('#page_detail').render('/get_user_read')">新建项目</a>
                             </li>
                             <li>
                                 <a onclick="$('#page_detail').render('/select_project')">数据分析</a>
                             </li>
-                            <li><a onclick="$('#page_detail').render('/get_sample_page');">新建样品信息表</a></li>
+                            <!--<li><a onclick="$('#page_detail').render('/get_sample_page');">新建样品信息表</a></li>-->
                         {% elif role=='manager' %}
                             <li>
                                 <a href="#" onclick="$('#selected_project_div').show();$('#selected_project')[0].selectedIndex=0;$('#detail').empty();" >查看项目分析数据</a>
@@ -326,9 +327,14 @@
 
     }
 
+    function show_sample_table(project_id) {
+        $('#page_detail').render('/get_sample_page?project_id=' + project_id);
+    }
+
     function format_upload_button(cellvalue, options, rowObject) {
         var project_id = rowObject['project_id'];
-        return "<button onclick='show_upload_page("+project_id+")'>项目文件</button>";
+        return "<button onclick='show_upload_page("+project_id+")'>项目文件</button>" +
+                "<button onclick='show_sample_table("+project_id+")'>样品</button>";
     }
 
     function show_my_project() {
@@ -363,12 +369,11 @@
                 { name: 'status', index: 'status', width: 80, editable: true, edittype: 'select', editoptions: { value: status_list, maxLength: 20 }},
                 { name: 'create_time', index: 'create_time', width: 120, editable:false},
                 { name: 'save', index: 'save', width: 120, editable:false},
-                { name: 'action', index: 'action', width: 120, hidden: false, formatter:format_upload_button}
+                { name: 'action', index: 'action', width: 130, hidden: false, formatter:format_upload_button}
             ],
             ondblClickRow: function(rowid) {
-                var project_number = $("#show_all").getRowData(rowid)['project_number'];
-                window.location.href='/input_info?action=update&project_number=' + project_number;
-
+                var project_id = $("#show_all").getRowData(rowid)['project_id'];
+                $('#page_detail').render('/get_input_info?project_id=' + project_id + '&action=update');
             },
             caption: table_title
         });

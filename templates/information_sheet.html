@@ -54,9 +54,9 @@
 
 		-->input {}
 	</style>
-</head>
+	<script src="/static/js/input.js" type="text/javascript"></script>
 
-<body link="#0000ff" dir="ltr">
+</head>
 	<div title="header">
 		<p class="western" align="center">
 			<font face="宋体"><span lang="zh-CN" style="text-align: center;"><b>完善的样品信息单是我们优质服务的开始</b></span></font>
@@ -87,7 +87,7 @@
 						<font face="宋体">
 							<span lang="zh-CN">
 							<b>项目编号：</b>
-							<input type="text" id="project_number" class="sample_project_master" onkeyup='this.value=this.value.replace(/\D/gi,"")'/>
+							<input type="text" disabled placeholder="将由系统生存" {% if action=='update' %} value="{{ data.project_number }}" {% endif %} id="project_number" class="sample_project_master"/>
 						</span>
 						</font>
 					</p>
@@ -98,7 +98,7 @@
 						<font face="宋体">
 							<span lang="zh-CN">
 							<b>项目名称：</b>
-							<input type="text" id="project_name" class="sample_project_master"/>
+							<input type="text" {% if action=='update' %} disabled {% endif %} id="project_name" value="{{ data.project_name }}" class="sample_project_master"/>
 						</span>
 						</font>
 					</p>
@@ -108,7 +108,7 @@
 						<font face="宋体">
 							<span lang="zh-CN">
 							<b>客户单位：</b>
-							<input type="text" id="cust_organization" class="sample_project_master"/>
+							<input type="text" {% if action=='update' %} disabled {% endif %} id="cust_organization" value="{{ data.cust_organization }}" class="sample_project_master"/>
 						</span>
 						</font>
 					</p>
@@ -121,8 +121,7 @@
 						<font face="宋体">
 							<span lang="zh-CN">
 								<b>客户姓名：</b>
-									<input type="text" id="cust_user" class="sample_project_master"/>
-							</span>
+								<input type="text" {% if action=='update' %} disabled {% endif %} id="cust_user" value="{{ data.cust_user }}" class="sample_project_master"/>							</span>
 						</font>
 					</p>
 				</td>
@@ -131,7 +130,7 @@
 						<font face="宋体">
 							<span lang="zh-CN">
 								<b>E-mail:</b>
-								<input type="text" id="email" class="sample_project_master" onkeyup='this.value=this.value.replace(/\D/gi,"")'/>
+								<input type="text" {% if action=='update' %} disabled {% endif %} id="email" value="{{ data.email }}" class="sample_project_master"/>
 							</span>
 						</font>
 					</p>
@@ -139,7 +138,7 @@
 				<td colspan="4" width="34%" valign="top" style="border: 1px solid #00000a; padding-top: 0in; padding-bottom: 0in; padding-left: 0.08in; padding-right: 0.08in">
 					<p class="western" style="margin-right: -0.13in">
 						<font face="宋体"><span lang="zh-CN"><b>联系电话：</b></span></font>
-						<input type="text" id="cust_tel" class="sample_project_master" onkeyup='this.value=this.value.replace(/\D/gi,"")'/>
+						<input type="text" {% if action=='update' %} disabled {% endif %} id="cust_tel" value="{{ data.cust_tel }}" class="sample_project_master"/>
 					</p>
 				</td>
 			</tr>
@@ -147,33 +146,35 @@
 				<td colspan="4" width="27%" height="12" valign="top" style="border: 1px solid #00000a; padding-top: 0in; padding-bottom: 0in; padding-left: 0.08in; padding-right: 0.08in">
 					<p class="western" style="margin-right: -0.13in">
 						<font face="宋体"><span lang="zh-CN"><b>销售姓名：</b></span></font>
-						<input type="text" id="sale_name" class="sample_project_master"/>
+						<input type="text" {% if action=='update' %} disabled {% endif %} id="sale_name" value="{{ data.sale_name }}" class="sample_project_master"/>
 					</p>
 				</td>
 				<td colspan="5" width="39%" valign="bottom" style="border: 1px solid #00000a; padding-top: 0in; padding-bottom: 0in; padding-left: 0.08in; padding-right: 0.08in">
 					<p class="western" align="left" style="margin-right: -0.13in; widows: 2; orphans: 2">
 						<font face="宋体"><span lang="zh-CN"><b>送样日期：</b></span></font>
-						<input type="text" id="sp_delive_date" class="sample_project_master"/>
+						<input type="text" {% if action=='update' %} disabled {% endif %} id="sp_delive_date" value="{{ data.sp_delive_date }}" class="sample_project_master"/>
 					</p>
 				</td>
 				<td colspan="4" width="34%" valign="bottom" style="border: 1px solid #00000a; padding-top: 0in; padding-bottom: 0in; padding-left: 0.08in; padding-right: 0.08in">
 					<p class="western" style="margin-right: -0.13in">
 						<font face="宋体"><span lang="zh-CN"><b>样本数量：</b></span></font>
-						<input type="text" id="sp_sum" class="sample_project_master" onkeyup='this.value=this.value.replace(/\D/gi,"")'/>
+						<input type="text" {% if action=='update' %} disabled {% endif %} id="sp_sum" value="{{ data.sp_sum }}" class="sample_project_master"/>
 					</p>
 				</td>
 			</tr>
 			<tr>
 				<td colspan="2" width="14%" height="12" valign="top" style="border: 1px solid #00000a; padding-top: 0in; padding-bottom: 0in; padding-left: 0.08in; padding-right: 0.08in">
 					<p class="western" align="left" style="margin-right: -0.13in">
-						<font face="宋体"><span lang="zh-CN"><b>样品物种</b></span></font>
+						<font face="宋体"><span lang="zh-CN"><b>样品物种</b></span>
+
+						</font>
 					</p>
 				</td>
 				<td colspan="11" width="86%" style="border: 1px solid #00000a; padding-top: 0in; padding-bottom: 0in; padding-left: 0.08in; padding-right: 0.08in">
 					<p>
 						<font face="宋体">
 							<font size="2" style="font-size: 9pt"><span lang="zh-CN">（填到种名，中文名称+拉丁文）：</span></font>
-							<input type="text" id="sample_species" class="sample_project_master" onkeyup='this.value=this.value.replace(/\D/gi,"")'/>
+							<input type="text" id="sample_species_txt"  disabled/>
 						</font>
 					</p>
 				</td>
@@ -191,7 +192,7 @@
 						<font size="2" style="font-size: 10pt">冻干粉</font>
 					</span>
 						</font>
-				<input type="checkbox" id="lyophillization" class="sample_species"/>
+						<input type="checkbox" id="lyophillization" class="sample_species" {% if data.lyophillization=='Y' %} checked {% endif %} />
 					</p>
 				</td>
 			</tr>
@@ -203,25 +204,25 @@
 								<font size="2" style="font-size: 10pt">溶于：TE buffer</font>
 						</span>
 					</font>
-					<input type="checkbox" id="te_buffer" class="sample_status"/>
+					<input type="checkbox" id="te_buffer" class="sample_species" {% if data.te_buffer=='Y' %} checked {% endif %}/>
 						<font face="宋体">
 							<span lang="zh-CN">
 							<font size="2" style="font-size: 10pt">ddH2o</font>
 							</span>
 						</font>
-						<input type="checkbox" id="ddh2o" class="sample_status"/>
+						<input type="checkbox" id="ddh2o" class="sample_species" {% if data.ddh2o=='Y' %} checked {% endif %}/>
 						<font face="宋体">
 							<span lang="zh-CN">
 							<font size="2" style="font-size: 10pt">DEPC水</font>
 							</span>
 						</font>
-						<input type="checkbox" id="depc" class="sample_status"/>
+						<input type="checkbox" id="depc" class="sample_species" {% if data.depc=='Y' %} checked {% endif %}/>
 						<font face="宋体">
 							<span lang="zh-CN">
 								<font size="2" style="font-size: 10pt">其他：</font>
 							</span>
 						</font>
-						<input type="text" id="sample_status_dissolve" class="sample_status"/>
+						<input type="text" id="sample_species_other" class="sample_species" value="{{ data.sample_species_other }}"/>
 					</p>
 				</td>
 			</tr>
@@ -233,25 +234,25 @@
 								<font size="2" style="font-size: 10pt">保存于：无水乙醇</font>
 							</span>
 						</font>
-						<input type="checkbox" id="ethanol" class="sample_status"/>
+						<input type="checkbox" id="ethanol" class="sample_status" {% if data.ethanol=='Y' %} checked {% endif %}/>
 						<font face="宋体">
 							<span lang="zh-CN">
 							<font size="2" style="font-size: 10pt">75%乙醇</font>
 							</span>
 						</font>
-						<input type="checkbox" id="ethanol_p75" class="sample_status"/>
+						<input type="checkbox" id="ethanol_p75" class="sample_status" {% if data.ethanol_p75=='Y' %} checked {% endif %}/>
 						<font face="宋体">
 							<span lang="zh-CN">
 								<font size="2" style="font-size: 10pt">异丙醇</font>
 							</span>
 						</font>
-						<input type="checkbox" id="propyl_alcohol" class="sample_status"/>
+						<input type="checkbox" id="propyl_alcohol" class="sample_status" {% if data.propyl_alcohol=='Y' %} checked {% endif %}/>
 						<font face="宋体">
 							<span lang="zh-CN">
 								<font size="2" style="font-size: 10pt">其他:</font>
 							</span>
 						</font>
-						<input type="text" id="sample_status_save" class="sample_status"/>
+						<input type="text" id="sample_status_other" class="sample_status" value="{{ data.sample_status_other }}"/>
 					</p>
 				</td>
 			</tr>
@@ -276,37 +277,37 @@
 								<font size="2" style="font-size: 10pt">DNA基因组</font>
 							</span>
 						</font>
-						<input type="checkbox" id="genomic_dna" class="sample_type"/>
+						<input type="checkbox" id="genomic_dna" class="sample_type" {% if data.genomic_dna=='Y' %} checked {% endif %}/>
 						<font face="宋体">
 							<span lang="zh-CN">
 								<font size="2" style="font-size: 10pt">ChIP-DNA</font>
 							</span>
 						</font>
-						<input type="checkbox" id="chip_dna" class="sample_type"/>
+						<input type="checkbox" id="chip_dna" class="sample_type" {% if data.chip_dna=='Y' %} checked {% endif %}/>
 						<font face="宋体">
 							<span lang="zh-CN">
 								<font size="2" style="font-size: 10pt">PCR片段</font>
 							</span>
 						</font>
-						<input type="checkbox" id="pcr_fragment" class="sample_type"/>
+						<input type="checkbox" id="pcr_fragment" class="sample_type" {% if data.pcr_fragment=='Y' %} checked {% endif %}/>
 						<font face="宋体">
 							<span lang="zh-CN">
 								<font size="2" style="font-size: 10pt">游离DNA</font>
 							</span>
 						</font>
-						<input type="checkbox" id="free_dna" class="sample_type"/>
+						<input type="checkbox" id="free_dna" class="sample_type" {% if data.free_dna=='Y' %} checked {% endif %}/>
 						<font face="宋体">
 							<span lang="zh-CN">
 								<font size="2" style="font-size: 10pt">线粒体DNA</font>
 							</span>
 						</font>
-						<input type="checkbox" id="mitochondrial_dna" class="sample_type"/>
+						<input type="checkbox" id="mitochondrial_dna" class="sample_type" {% if data.mitochondrial_dna=='Y' %} checked {% endif %}/>
 						<font face="宋体">
 							<span lang="zh-CN">
 								<font size="2" style="font-size: 10pt">其他：</font>
 							</span>
 						</font>
-						<input type="text" id="others_dna" class="sample_type"/>
+						<input type="text" id="others_dna" class="sample_type" value="{{ data.others_dna }}"/>
 				</td>
 			</tr>
 			<tr valign="top">
@@ -323,28 +324,28 @@
 						<font face="Arial, serif">
 							<font size="2" style="font-size: 10pt">Total RNA</font>
 						</font>
-						<input type="checkbox" id="total_rna" class="sample_type"/>
+						<input type="checkbox" id="total_rna" class="sample_type" {% if data.total_rna=='Y' %} checked {% endif %}/>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">去核糖体</font></span></font>
 						<font face="Arial, serif">
 							<font size="2" style="font-size: 10pt">RNA</font>
 						</font>
-						<input type="checkbox" id="to_ribosomal_rna" class="sample_type"/>
+						<input type="checkbox" id="to_ribosomal_rna" class="sample_type" {% if data.to_ribosomal_rna=='Y' %} checked {% endif %}/>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">小</font></span></font>
 						<font face="Arial, serif">
 							<font size="2" style="font-size: 10pt">RNA</font>
 						</font>
-						<input type="checkbox" id="small_rna" class="sample_type"/>
+						<input type="checkbox" id="small_rna" class="sample_type" {% if data.small_rna=='Y' %} checked {% endif %}/>
 						<font face="Arial, serif">
 							<font size="2" style="font-size: 10pt">cDNA</font>
 						</font>
-						<input type="checkbox" id="c_dna" class="sample_type"/>
+						<input type="checkbox" id="c_dna" class="sample_type" {% if data.c_dna=='Y' %} checked {% endif %}/>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">血浆</font></span></font>
 						<font face="Arial, serif">
 							<font size="2" style="font-size: 10pt">RNA</font>
 						</font>
-						<input type="checkbox" id="plasma_rna" class="sample_type"/>
+						<input type="checkbox" id="plasma_rna" class="sample_type" {% if data.plasma_rna=='Y' %} checked {% endif %}/>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">其他：</font></span></font>
-						<input type="text" id="other_rna" class="sample_type"/>
+						<input type="text" id="other_rna" class="sample_type" value="{{ data.other_rna }}"/>
 					</p>
 				</td>
 			</tr>
@@ -359,18 +360,18 @@
 				<td colspan="11" width="86%" valign="top" style="border: 1px solid #00000a; padding-top: 0in; padding-bottom: 0in; padding-left: 0.08in; padding-right: 0.08in">
 					<p class="western" align="left" style="margin-right: -0.13in; margin-bottom: 0in">
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">重测序</font></span></font>
-						<input type="checkbox" id="resequencing" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="resequencing" class="dna_sample_sequencing_type" {% if data.resequencing=='Y' %} checked {% endif %}/>
 						<font face="Arial, serif">
 							<font size="2" style="font-size: 10pt">De novo</font>
 						</font>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">测序</font></span></font>
-						<input type="checkbox" id="de_novo_sequencing" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="de_novo_sequencing" class="dna_sample_sequencing_type" {% if data.de_novo_sequencing=='Y' %} checked {% endif %}/>
 						<font face="Arial, serif">
 							<font size="2" style="font-size: 10pt">Mate pair-2K/5K/8K/10K</font>
 						</font>
-						<input type="checkbox" id="mate_pair" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="mate_pair" class="dna_sample_sequencing_type" {% if data.mate_pair=='Y' %} checked {% endif %}/>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">低起始量重测序</font></span></font>
-						<input type="checkbox" id="low_initial_weight_sequencing" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="low_initial_weight_sequencing" class="dna_sample_sequencing_type" {% if data.low_initial_weight_sequencing=='Y' %} checked {% endif %}/>
 					</p>
 				</td>
 			</tr>
@@ -378,18 +379,18 @@
 				<td colspan="11" width="86%" style="border: 1px solid #00000a; padding-top: 0in; padding-bottom: 0in; padding-left: 0.08in; padding-right: 0.08in">
 					<p class="western" style="margin-right: -0.13in">
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">外显子组</font></span></font>
-						<input type="checkbox" id="exome" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="exome" class="dna_sample_sequencing_type" {% if data.exome=='Y' %} checked {% endif %}/>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">目标区域捕获</font></span></font>
-						<input type="checkbox" id="target_area_capture" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="target_area_capture" class="dna_sample_sequencing_type" {% if data.target_area_capture=='Y' %} checked {% endif %}/>
 						<font face="Arial, serif">
 							<font size="2" style="font-size: 10pt">PCR</font>
 						</font>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">产物测序（</font></span></font>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">（已纯化</font></span></font>
-						<input type="checkbox" id="purified" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="purified" class="dna_sample_sequencing_type" {% if data.purified=='Y' %} checked {% endif %}/>
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">）</font></font>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">（未纯化</font></span></font>
-						<input type="checkbox" id="unpurified" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="unpurified" class="dna_sample_sequencing_type" {% if data.unpurified=='Y' %} checked {% endif %}/>
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">）</font></font>
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">）</font></font>
 					</p>
@@ -399,11 +400,11 @@
 				<td colspan="11" width="86%" style="border: 1px solid #00000a; padding-top: 0in; padding-bottom: 0in; padding-left: 0.08in; padding-right: 0.08in">
 					<p class="western" style="margin-right: -0.13in">
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">16S rDNA</font></font>
-						<input type="checkbox" id="d16s_rdna" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="d16s_rdna" class="dna_sample_sequencing_type" {% if data.d16s_rdna=='Y' %} checked {% endif %}/>
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">RAD</font></font>
-						<input type="checkbox" id="rad" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="rad" class="dna_sample_sequencing_type" {% if data.rad=='Y' %} checked {% endif %}/>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">宏基因组</font></span></font>
-						<input type="checkbox" id="metagenome" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="metagenome" class="dna_sample_sequencing_type" {% if data.metagenome=='Y' %} checked {% endif %}/>
 					</p>
 				</td>
 			</tr>
@@ -411,13 +412,13 @@
 				<td colspan="11" width="86%" style="border: 1px solid #00000a; padding-top: 0in; padding-bottom: 0in; padding-left: 0.08in; padding-right: 0.08in">
 					<p class="western" style="margin-right: -0.13in">
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">ChIP-seq</font></font>
-						<input type="checkbox" id="chip_seq" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="chip_seq" class="dna_sample_sequencing_type" {% if data.chip_seq=='Y' %} checked {% endif %}/>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">全基因组甲基化测序</font></span></font>
-						<input type="checkbox" id="dna_methylation_sequencing" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="dna_methylation_sequencing" class="dna_sample_sequencing_type" {% if data.dna_methylation_sequencing=='Y' %} checked {% endif %}/>
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">RRBS</font></font>
-						<input type="checkbox" id="rrbs" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="rrbs" class="dna_sample_sequencing_type" {% if data.rrbs=='Y' %} checked {% endif %}/>
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">MeDIP-seq</font></font>
-						<input type="checkbox" id="medip_seq" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="medip_seq" class="dna_sample_sequencing_type" {% if data.medip_seq=='Y' %} checked {% endif %}/>
 					</p>
 				</td>
 			</tr>
@@ -425,9 +426,9 @@
 				<td colspan="11" width="86%" style="border: 1px solid #00000a; padding-top: 0in; padding-bottom: 0in; padding-left: 0.08in; padding-right: 0.08in">
 					<p class="western" style="margin-right: -0.13in">
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">线粒体测序</font></span></font>
-						<input type="checkbox" id="mitochondrial_dna_sequencing" class="dna_sample_sequencing_type"/>
+						<input type="checkbox" id="mitochondrial_dna_sequencing" class="dna_sample_sequencing_type" {% if data.mitochondrial_dna_sequencing=='Y' %} checked {% endif %}/>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">其他：</font></span></font>
-						<input type="text" id="dna_sample_sequencing_type_other" class="dna_sample_sequencing_type"/>
+						<input type="text" id="dna_sample_sequencing_type_other" class="dna_sample_sequencing_type" value="{{ data.dna_sample_sequencing_type_other }}"/>
 					</p>
 				</td>
 			</tr>
@@ -443,13 +444,13 @@
 					<p class="western" style="margin-right: -0.13in">
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">真核生物</font></span></font>
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">mRNA-seq</font></font>
-						<input type="checkbox" id="three_eukaryotic_mrna_seq" class="rna_sample_sequencing_type"/>
+						<input type="checkbox" id="three_eukaryotic_mrna_seq" class="rna_sample_sequencing_type" {% if data.three_eukaryotic_mrna_seq=='Y' %} checked {% endif %}/>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">原核生物</font></span></font>
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">mRNA-seq</font></font>
-						<input type="checkbox" id="mrna_seq_prokaryotae" class="rna_sample_sequencing_type"/>
+						<input type="checkbox" id="mrna_seq_prokaryotae" class="rna_sample_sequencing_type" {% if data.mrna_seq_prokaryotae=='Y' %} checked {% endif %}/>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">真核生物低起始量</font></span></font>
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">mRNA-seq</font></font>
-						<input type="checkbox" id="low_initial_amount_of_eukaryotic_mrna_seq" class="rna_sample_sequencing_type"/>
+						<input type="checkbox" id="low_initial_amount_of_eukaryotic_mrna_seq" class="rna_sample_sequencing_type" {% if data.low_initial_amount_of_eukaryotic_mrna_seq=='Y' %} checked {% endif %}/>
 					</p>
 				</td>
 			</tr>
@@ -457,16 +458,16 @@
 				<td colspan="11" width="86%" style="border: 1px solid #00000a; padding-top: 0in; padding-bottom: 0in; padding-left: 0.08in; padding-right: 0.08in">
 					<p class="western" style="margin-right: -0.13in">
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">链特异性转录组</font></span></font>
-						<input type="checkbox" id="strand_specific_transcriptome" class="rna_sample_sequencing_type"/>
+						<input type="checkbox" id="strand_specific_transcriptome" class="rna_sample_sequencing_type" {% if data.strand_specific_transcriptome=='Y' %} checked {% endif %}/>
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">lncRNA-seq</font></font>
-						<input type="checkbox" id="lncrna_seq" class="rna_sample_sequencing_type"/>
+						<input type="checkbox" id="incrna_seq" class="rna_sample_sequencing_type" {% if data.incrna_seq=='Y' %} checked {% endif %}/>
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">cDNA</font></font>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">转录组</font></span></font>
-						<input type="checkbox" id="c_dna_transcriptome" class="rna_sample_sequencing_type"/>
+						<input type="checkbox" id="c_dna_transcriptome" class="rna_sample_sequencing_type" {% if data.c_dna_transcriptome=='Y' %} checked {% endif %}/>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">单细胞</font></span></font>
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">cDNA</font></font>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">转录组</font></span></font>
-						<input type="checkbox" id="cdna_single_cell_transcriptom" class="rna_sample_sequencing_type"/>
+						<input type="checkbox" id="cdna_single_cell_transcriptom" class="rna_sample_sequencing_type" {% if data.cdna_single_cell_transcriptom=='Y' %} checked {% endif %}/>
 					</p>
 				</td>
 			</tr>
@@ -476,13 +477,13 @@
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">小</font></span></font>
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">RNA</font></font>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">测序</font></span></font>
-						<input type="checkbox" id="small_rna_sequencing" class="rna_sample_sequencing_type"/>
+						<input type="checkbox" id="small_rna_sequencing" class="rna_sample_sequencing_type" {% if data.small_rna_sequencing=='Y' %} checked {% endif %}/>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">血浆小</font></span></font>
 						<font face="Arial, serif"><font size="2" style="font-size: 10pt">RNA</font></font>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">测序</font></span></font>
-						<input type="checkbox" id="plasma_small_rna_equencing" class="rna_sample_sequencing_type"/>
+						<input type="checkbox" id="plasma_small_rna_equencing" class="rna_sample_sequencing_type" {% if data.plasma_small_rna_equencing=='Y' %} checked {% endif %}/>
 						<font face="宋体"><span lang="zh-CN"><font size="2" style="font-size: 10pt">其他：</font></span></font>
-						<input type="text" id="rna_sample_sequencing_type_other" class="rna_sample_sequencing_type"/>
+						<input type="text" id="rna_sample_sequencing_type_other" class="rna_sample_sequencing_type" value="{{ data.rna_sample_sequencing_type_other }}"/>
 					</p>
 				</td>
 			</tr>

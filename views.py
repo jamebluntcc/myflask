@@ -36,14 +36,18 @@ def main():
 
 @app.route('/save_input', methods=['GET'])
 def save_info():
-    username = session.get('login_id')
-    if not username:
-        return redirect('/login')
-    all_info = request.args.get('all_info')
-    all_info = json.loads(all_info)
-    action = request.args.get('action')
+    try:
+        username = session.get('login_id')
+        if not username:
+            return redirect('/login')
+        all_info = request.args.get('all_info')
+        all_info = json.loads(all_info)
+        action = request.args.get('action')
 
-    return jsonify(interface.save_info(all_info, username, action))
+        return jsonify(interface.save_info(all_info, username, action))
+    except Exception, e:
+        import traceback
+        traceback.print_exc()
 
 
 @app.route('/save_compare_input', methods=['POST'])
@@ -186,19 +190,14 @@ def get_all_user_data():
 @app.route('/get_input_info', methods=['GET', 'POST'])
 def get_input_info():
     username = session.get('login_id')
-
-
-    # if not username:
-    #     return redirect('/login')
+    if not username:
+        return redirect('/login')
     # user_role, status = interface.get_user_role(username)
-    # action = request.args.get('action')
-    # action = 'new' if not action else action
-    # project_number = request.args.get('project_number')
-    # data = interface.get_one_project_data(project_number) if project_number else {}
-    # manager_list = interface.get_manager_list()
-    #
-    # return render_template('user_input.html', data=data, action=action, role=user_role, manager_list=manager_list)
-    return render_template('information_sheet.html')
+    action = request.args.get('action')
+    action = 'new' if not action else action
+    project_id = request.args.get('project_id')
+    data = interface.get_one_project_data(project_id) if project_id else {}
+    return render_template('information_sheet.html', data=data, action=action)
 
 
 @app.route('/save_sample_row', methods=['GET', 'POST'])
@@ -307,16 +306,11 @@ def get_upload_page():
 @app.route('/get_sample_page', methods=['GET', 'POST'])
 def get_sample_page():
     try:
-        project_id = 1
+        project_id = request.args.get('project_id')
         return render_template('sample.html', project_id=project_id)
     except Exception, e:
         import traceback
         traceback.print_exc()
-
-
-# @app.route('/test_page', methods=['GET', 'POST'])
-# def test_page():
-#     return render_template('.html', project_id=project_id)
 
 
 @app.route('/get_project_files', methods=['GET', 'POST'])
@@ -339,6 +333,11 @@ def save_sample_table():
         traceback.print_exc()
 
     return jsonify({'data': '保存成功!', 'errcode': 0, 'msg': 'Success'})
+
+
+@app.route('/get_user_read', methods=['POST', 'GET'])
+def get_user_read():
+    return render_template('user_read.html')
 
 
 if __name__ == '__main__':
