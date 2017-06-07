@@ -5,7 +5,7 @@ import os
 import xlrd
 from openpyxl import Workbook
 from db import DBConn
-from werkzeug.security import generate_password_hash,check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 table1_map = {
     '任单编号': 'any_single_num',
@@ -30,9 +30,7 @@ def save_info(all_info, username, action='new'):
         print e
         return {'data': '', 'errcode': 1, 'msg': '保存失败！项目编号已经存在，请另外选择项目编号。'}
 
-    save_table_info(db_instance, all_info.get('table_data'), project_id, action)
     del all_info['sample_project_master_info']
-    del all_info['table_data']
     for key in all_info.keys():
         table_name = key.replace('_info', '')
         data_info = all_info.get(key)
@@ -43,7 +41,7 @@ def save_info(all_info, username, action='new'):
              db_instance.insert(table_name, data_info)
 
     msg = '更新成功！' if action == 'update' else '保存成功!'
-    return {'data': '', 'errcode': 0, 'msg': msg}
+    return {'data': project_id, 'errcode': 0, 'msg': msg}
 
 
 def get_project_id_by_num(db_instance, project_number):
@@ -152,6 +150,11 @@ def save_sample_project_master_info(db_instance, data_info, username, action):
         db_instance.update('sample_project_master', {'id': preject_id}, data_info)
         return preject_id
     else:
+        cmd = "select max(project_number) from sample_project_master"
+        result = db_instance.execute(cmd, get_all=False)
+        name_list = result[0].split('-')
+        new_project_num = name_list[0] + '-' + str(int(name_list[1]) + 1)
+        data_info['project_number'] = new_project_num
         data_info['created_by'] = username
         data_info['create_time'] = datetime.datetime.now()
         data_info['project_log'] = "%s: %s create new project.\n" % (time, username)
@@ -193,7 +196,7 @@ def get_all_user_data():
     return data
 
 
-def get_one_project_data(project_number):
+def get_one_project_data(project_id):
     cmd = """select * from sample_project_master spm,
              sample_species ss,
              sample_type st,
@@ -205,18 +208,10 @@ def get_one_project_data(project_number):
              dsst.project_id=spm.id and
              rsst.project_id=spm.id and
              other.project_id=spm.id and
-             spm.project_number=%s""" % project_number
+             spm.id=%s""" % project_id
     db = DBConn()
     result = db.execute(cmd, get_all=False)
     data = dict(result)
-    cmd = "select * from sample_info_detail where project_id=%s" % result['project_id']
-    table_data = []
-    results = db.execute(cmd)
-    for result in results:
-        table_data.append(dict(result))
-
-    data['table_data'] = table_data
-
     return data
 
 
@@ -236,9 +231,19 @@ def phone_check(s):
 
     return True if len(s) == 11 and s.isdigit() and s[:3] in phone_prefix else False
 
-'''
-changed by chencheng on 2017-06-01 add password hash
-'''
+# def get_user_role(username, password=''):
+#     db = DBConn()
+#     if phone_check(username):
+#         cmd = "select role,status from user_info where tel='%s'" % username
+#     else:
+#         cmd = "select role,status from user_info where username='%s'" % username
+#     if password:
+#         cmd += " and password='%s'" % password
+#     result = db.execute(cmd, get_all=False)
+#     role = result[0] if result else ''
+#     status = result[1] if result else ''
+#     return role, status
+
 def get_user_role(username, password=''):
     db = DBConn()
     if phone_check(username):
@@ -248,12 +253,12 @@ def get_user_role(username, password=''):
     result = db.execute(cmd, get_all=False)
     password_hash = result[2] if result else ''
     if password:
-        if check_password_hash(password_hash,password):
+        if check_password_hash(password_hash, password):
             role = result[0] if result else ''
             status = result[1] if result else ''
             return role, status
         else:
-            return ('','')
+            return '', ''
     else:
         role = result[0] if result else ''
         status = result[1] if result else ''
@@ -290,10 +295,11 @@ def change_password(info):
     db = DBConn()
     cmd = "select password from user_info where username='%s'" % username
     result = db.execute(cmd, get_all=False)
-    if result and check_password_hash(result[0],info['old_passwd']) and info['new_passwd'] != info['old_passwd']:
+    if result and check_password_hash(result[0], info['old_passwd']) and info['new_passwd'] != info['old_passwd']:
         password_hash = generate_password_hash(info['new_passwd'])
         db.update('user_info', {'username': username}, {'password': password_hash,
                                                         'update_time': datetime.datetime.now()})
+
         return {'data': '', 'errcode': 0, 'msg': '更新成功！'}
     elif result and check_password_hash(result,info['old_password']):
         return {'data': '', 'errcode': 1, 'msg': '旧密码错误！'}
@@ -330,8 +336,7 @@ def save_user_info(info):
     elif tel_result:
         ret = fail_info(tel_result, '电话号码')
     else:
-        hash_password = generate_password_hash(info.get('password'))
-        info['password'] = hash_password
+        info['password'] = generate_password_hash(info.get('password'))
         db.insert('user_info', info)
         ret = {'data': '', 'errcode': 0, 'msg': '注册成功：等待审核！'}
 

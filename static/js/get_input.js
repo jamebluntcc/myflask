@@ -93,6 +93,7 @@ $(document).ready(function(){
      }
 
     $("#submit").click(function() {
+        alert('dddd');
         var all_info = get_input_data();
         console.log(all_info);
         var error_msg = validate_data(all_info);
