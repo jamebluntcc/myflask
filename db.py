@@ -40,8 +40,8 @@ class DBConn(object):
     def _get_engine(self):
         engine = create_engine('mysql+pymysql://{user}:{pass_wd}@{host}/{db}?charset={charset}'.format(
             user='root',
-            pass_wd='root',
-            host='127.0.0.1',
+            pass_wd='050400',
+            host='localhost',
             db='SEQ_SA_INFO',
             charset='utf8'),
             echo=False,

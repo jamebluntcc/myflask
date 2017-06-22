@@ -135,6 +135,9 @@ def save_user_info():
         data = interface.save_user_info(json.loads(user_info))
     except Exception, e:
         print e
+        import traceback
+        traceback.print_exc()
+
     return jsonify(data)
 
 
@@ -155,6 +158,7 @@ def change_password():
         data = interface.change_password(json.loads(user_info))
     except Exception, e:
         print e
+        sys.exit(1)
     return jsonify(data)
 
 
@@ -164,7 +168,7 @@ def validate_code():
         code = get_validate_code()
     except Exception, e:
         print e
-
+        sys.exit(1)
     return code
 
 
@@ -341,4 +345,4 @@ def get_user_read():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=5000, debug=True)

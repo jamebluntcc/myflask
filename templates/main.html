@@ -13,6 +13,11 @@
 <script src="/static/js/jquery.jqGrid.src.js"></script>
 <script src="/static/js/grid.locale-en.js"></script>
 <script src="/static/js/main.js"></script>
+<script>
+ $(document).ready(function(){
+   show_my_project();
+ });
+</script>
 <body>
 <style>
     li>div>span {
@@ -31,6 +36,7 @@
                         用户名: {{ username }}
                     {% endif %}
                     </a>
+                    <!--
                     <a class="navbar-brand active" href="#"  onclick="show_my_project()">
                         {% if role=='user' %}
                             我的项目
@@ -38,6 +44,7 @@
                             我负责的项目
                         {% endif %}
                     </a>
+                  -->
 				</div>
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<ul class="nav navbar-nav">
@@ -148,7 +155,8 @@
                                 </li>
                                 <li>
                                     <a>请输入新密码</a>
-							        <input type="password" id="new-password" placeholder="新密码" style="width: 200px">
+							        <input type="password" id=
+                                <li id="new-password" placeholder="新密码" style="width: 200px">
                                     <div id="new-password-mess"></div>
                                 </li>
                             </ul>
@@ -162,6 +170,7 @@
 			</div>
 
             <div id="page_detail">
+              <!--
                 <div id="self_info" class="jumbotron" style="padding-bottom: 150px">
                     <h2>个人信息</h2>
                     <p>
@@ -203,6 +212,7 @@
                         </div>
                     </p>
                 </div>
+              -->
                 <div id="selected_project_div" hidden>
                     <a>选择数据项目: </a>
                     <select id="selected_project" onchange="show_render()">
@@ -211,7 +221,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="jumbotron" id="detail">
+      <div class="jumbotron" id="detail">
 				<h1>欢迎登录建库信息系统</h1>
 				<p>
 					在系统中，您可以点击上面的“新建项目”，跳转到新页面，然后提供给我们您的基本信息，您也可以通过点击“数据分析” 提供给我们您的样品分组信息和差异比较方案，我们将最近根据您提供的信息尽快分析得出结果。
@@ -221,7 +231,7 @@
 					 <a class="btn btn-primary btn-large" href="http://www.onmath.cn/">了解更多</a>
 				</p>
 			</div>
-            </div>
+    </div>
 		</div>
 	</div>
 </div>
@@ -340,7 +350,7 @@
     function show_my_project() {
 //        $('#page_detail')
 //        $('#selected_project_div').hide();
-        $("#page_detail").children().remove();
+        //$("#page_detail").children().remove();
         $('#page_detail').append("<table id='show_all'></table>");
         var role = "{{ role }}";
         var table_title =  "我申请的项目:（双击行可修改项目）";
