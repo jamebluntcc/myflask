@@ -1,13 +1,18 @@
-#coding=utf-8
-import datetime
-import time
+# coding=utf-8
 import os
+import sys
+import time
 import xlrd
+import datetime
 from openpyxl import Workbook
+
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 from db import DBConn
 from werkzeug.security import generate_password_hash, check_password_hash
 
+'''
 table1_map = {
     '任单编号': 'any_single_num',
     '样品编号': 'sample_number',
@@ -21,7 +26,7 @@ table1_map = {
     '文库体积(ul)': 'library_volume',
     '数据量（raw data）': 'data_size'
 }
-
+'''
 
 def save_info(all_info, username, action='new'):
     db_instance = DBConn()
@@ -641,6 +646,20 @@ def get_project_info(project_id):
     result = db.execute(cmd, get_all=False)
 
     return dict(result)
+
+'''
+add by chencheng
+'''
+
+def get_project_leader():
+    db = DBConn()
+    cmd = "SELECT customer_name FROM user_info where role='manager'"
+    results = db.execute(cmd)
+    project_leaders = []
+    for result in results:
+        project_leaders.append(result[0])
+
+    return project_leaders
 
 
 if __name__ == '__main__':

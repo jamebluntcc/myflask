@@ -12,10 +12,12 @@ $(document).ready(function(){
         var dna_sample_sequencing_type = $(".dna_sample_sequencing_type");
         var rna_sample_sequencing_type = $(".rna_sample_sequencing_type");
         var sample_other = $(".sample_other");
-
+        // add project_leader
+        var project_leader = $("#project_leader").find("option:selected").text();
         for (var i=0;i<sample_project_master.length;i++) {
             sample_project_master_info[sample_project_master[i].id] = sample_project_master[i].value;
         }
+        sample_project_master_info['project_leader'] = project_leader
 
         for (var i=0;i<sample_species.length;i++) {
             if (sample_species[i].type == 'checkbox') {

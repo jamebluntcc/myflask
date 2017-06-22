@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="content-type" content="text/html; charset=GBK">
 	<title></title>
 	<style type="text/css">
 		<!-- @page {
@@ -66,7 +66,7 @@
 		<font face="宋体"><span lang="zh-CN"><font size="5" style="font-size: 18pt"><b>建 库 测 序 样 品 信 息 单</b></font></span></font>
 	</p>
 	<center>
-		<table width="60%" cellpadding="7" cellspacing="0">
+		<table width="80%" cellpadding="7" cellspacing="0">
 			<col width="25*">
 			<col width="10*">
 			<col width="14*">
@@ -83,7 +83,6 @@
 			<tr valign="top">
 				<td colspan="4" width="27%" height="11" style="border: 1px solid #00000a; padding-top: 0in; padding-bottom: 0in; padding-left: 0.08in; padding-right: 0.08in">
 					<p class="western" style="margin-right: -0.13in">
-						<span class="validate">*</span>
 						<font face="宋体">
 							<span lang="zh-CN">
 							<b>项目编号：</b>
@@ -145,8 +144,16 @@
 			<tr>
 				<td colspan="4" width="27%" height="12" valign="top" style="border: 1px solid #00000a; padding-top: 0in; padding-bottom: 0in; padding-left: 0.08in; padding-right: 0.08in">
 					<p class="western" style="margin-right: -0.13in">
-						<font face="宋体"><span lang="zh-CN"><b>销售姓名：</b></span></font>
-						<input type="text" {% if action=='update' %} disabled {% endif %} id="sale_name" value="{{ data.sale_name }}" class="sample_project_master"/>
+						<font face="宋体"><span lang="zh-CN"><b>项目负责人:</b></span></font>
+						{% if action=='update' %}
+							<input type="text"  disabled  id="project_leader" value="{{ data.project_leader }}" class="sample_project_master"/>
+						{% else %}
+							<select id="project_leader">
+								{% for project_leader in data.project_leaders %}
+									<<option>{{ project_leader }}</option>
+								{% endfor %}
+							</select>
+						{% endif %}
 					</p>
 				</td>
 				<td colspan="5" width="39%" valign="bottom" style="border: 1px solid #00000a; padding-top: 0in; padding-bottom: 0in; padding-left: 0.08in; padding-right: 0.08in">

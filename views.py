@@ -199,8 +199,10 @@ def get_input_info():
     # user_role, status = interface.get_user_role(username)
     action = request.args.get('action')
     action = 'new' if not action else action
+    if action == 'new':
+        project_leaders = interface.get_project_leader()
     project_id = request.args.get('project_id')
-    data = interface.get_one_project_data(project_id) if project_id else {}
+    data = interface.get_one_project_data(project_id) if project_id else {'project_leaders':project_leaders}
     return render_template('information_sheet.html', data=data, action=action)
 
 
