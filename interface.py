@@ -149,7 +149,7 @@ def save_table_info(db_instance, table_data, project_id, action):
 def save_sample_project_master_info(db_instance, data_info, username, action):
     time = datetime.datetime.now()
     if action == 'update':
-        cmd = "select id from sample_project_master where project_number=%s" % data_info['project_number']
+        cmd = "select id from sample_project_master where project_number='%s'" % data_info['project_number']
         result = db_instance.execute(cmd, get_all=False)
         preject_id = result[0]
         data_info['project_log'] += "\n%s: %s update this project.\n" % (time, username)
@@ -601,7 +601,7 @@ def get_project_files(project_number, project_name):
     return {'data': file_list, 'errcode': 0, 'msg': ""}
 
 
-def save_simple_data(project_id, data):
+def save_sample_data(project_id, data):
     try:
         table_name = "sample_table"
         db = DBConn()
@@ -653,7 +653,7 @@ add by chencheng
 
 def get_project_leader():
     db = DBConn()
-    cmd = "SELECT customer_name FROM user_info where role='manager'"
+    cmd = "SELECT username FROM user_info where role='manager'"
     results = db.execute(cmd)
     project_leaders = []
     for result in results:
