@@ -43,9 +43,8 @@ def save_info():
         all_info = request.args.get('all_info')
         all_info = json.loads(all_info)
         action = request.args.get('action')
-        commit = request.args.get('commit')
 
-        return jsonify(interface.save_info(all_info, commit, username, action))
+        return jsonify(interface.save_info(all_info, username, action))
     except Exception, e:
         import traceback
         traceback.print_exc()
