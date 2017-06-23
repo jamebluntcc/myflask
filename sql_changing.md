@@ -266,8 +266,7 @@ CREATE TABLE `SEQ_SA_INFO`.`project_log_table` (
   `action` VARCHAR(45) NULL,
   `time` VARCHAR(45) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `id_UNIQUE` (`id` ASC),
-  UNIQUE INDEX `project_id_UNIQUE` (`project_id` ASC));
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC);
 
   ALTER TABLE `SEQ_SA_INFO`.`sample_project_master`
   DROP COLUMN `sale_name`;
