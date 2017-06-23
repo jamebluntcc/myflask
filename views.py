@@ -43,8 +43,9 @@ def save_info():
         all_info = request.args.get('all_info')
         all_info = json.loads(all_info)
         action = request.args.get('action')
+        commit = request.args.get('commit')
 
-        return jsonify(interface.save_info(all_info, username, action))
+        return jsonify(interface.save_info(all_info, commit, username, action))
     except Exception, e:
         import traceback
         traceback.print_exc()
@@ -93,10 +94,12 @@ def check_login():
         return jsonify({'data': '', 'errcode': 1, 'msg': '管理员拒绝通过审核或者该帐号已被禁用， 详情请联系系统管理员！'})
     elif user_role == 'user':
         session['login_id'] = username
+        session['role'] = user_role
         return jsonify({'data': '', 'errcode': 0, 'msg': '登录成功！'})
     elif user_role == 'manager':
         # TODO: show manager page
         session['login_id'] = username
+        session['role'] = user_role
         return jsonify({'data': '', 'errcode': 0, 'msg': '登录成功！'})
 
 
@@ -194,6 +197,7 @@ def get_all_user_data():
 @app.route('/get_input_info', methods=['GET', 'POST'])
 def get_input_info():
     username = session.get('login_id')
+    role = session.get('role')
     if not username:
         return redirect('/login')
     # user_role, status = interface.get_user_role(username)
@@ -203,7 +207,7 @@ def get_input_info():
         project_leaders = interface.get_project_leader()
     project_id = request.args.get('project_id')
     data = interface.get_one_project_data(project_id) if project_id else {'project_leaders':project_leaders}
-    return render_template('information_sheet.html', data=data, action=action)
+    return render_template('information_sheet.html', data=data, action=action,role=role)
 
 
 @app.route('/save_sample_row', methods=['GET', 'POST'])
@@ -333,7 +337,7 @@ def save_sample_table():
         data = request.form['sample_table_data']
         data = json.loads(data) if data else []
         project_id = request.form['project_id']
-        interface.save_simple_data(project_id, data)
+        interface.save_sample_data(project_id, data)
     except Exception, e:
         import traceback
         traceback.print_exc()
