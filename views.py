@@ -322,6 +322,27 @@ def get_sample_page():
         traceback.print_exc()
 
 
+@app.route('/get_log_data', methods=['GET', 'POST'])
+def get_log_data():
+        project_id = request.args.get('project_id')
+        username = session.get('login_id')
+        if not username:
+            return redirect('/login')
+        data = interface.get_log_data(project_id)
+        return jsonify({'data': data, 'errcode': 0, 'msg': 'Success'})
+
+
+@app.route('/get_log_page', methods=['GET', 'POST'])
+def get_log_page():
+    try:
+        project_id = request.args.get('project_id')
+        project_info = interface.get_project_info(project_id)
+        return render_template('log_table.html', project_name=project_info['project_name'],project_id=project_id)
+    except Exception, e:
+        import traceback
+        traceback.print_exc()
+
+
 @app.route('/get_project_files', methods=['GET', 'POST'])
 def get_project_files():
     project_number = request.args.get('project_number')

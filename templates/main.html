@@ -340,11 +340,18 @@
     function show_sample_table(project_id) {
         $('#page_detail').render('/get_sample_page?project_id=' + project_id);
     }
+    /*
+    add show_log_table by chencheng
+    */
+    function show_log_table(project_id) {
+      $("#page_detail").render('/get_log_page?project_id=' + project_id);
+    }
 
     function format_upload_button(cellvalue, options, rowObject) {
         var project_id = rowObject['project_id'];
         return "<button onclick='show_upload_page("+project_id+")'>项目文件</button>" +
-                "<button onclick='show_sample_table("+project_id+")'>样品</button>";
+                "<button onclick='show_sample_table("+project_id+")'>样品</button>" +
+                "<button onclick='show_log_table("+project_id+")'>log表格</button>";
     }
 
     function show_my_project() {
@@ -362,7 +369,7 @@
         $("#show_all").jqGrid({
             datatype: 'local',
             height: 250,
-            colNames: ['project_id', '项目编号', '项目名称', '客户单位', '客户姓名', 'E-mail' ,'联系电话' ,'销售姓名',
+            colNames: ['project_id', '项目编号', '项目名称', '客户单位', '客户姓名', 'E-mail' ,'联系电话' ,
                 '送样日期', '样本数量', '项目负责人', '项目状态', '创建时间', '', ''],
             colModel: [
                 { name: 'project_id', index: 'project_id', width: 65, editable:false, hidden:true},
@@ -372,14 +379,13 @@
                 { name: 'cust_user', index: 'cust_user', width: 65, editable:false},
                 { name: 'email', index: 'email', width: 65, editable:false},
                 { name: 'cust_tel', index: 'cust_tel', width: 65, editable:false},
-                { name: 'sale_name', index: 'sale_name', width: 65, editable:false},
                 { name: 'sp_delive_date', index: 'sp_delive_date', width: 65, editable:false},
                 { name: 'sp_sum', index: 'sp_sum', width: 65},
                 { name: 'project_leader', index: 'project_leader', width: 80, editable:false},
                 { name: 'status', index: 'status', width: 80, editable: true, edittype: 'select', editoptions: { value: status_list, maxLength: 20 }},
                 { name: 'create_time', index: 'create_time', width: 120, editable:false},
                 { name: 'save', index: 'save', width: 120, editable:false},
-                { name: 'action', index: 'action', width: 130, hidden: false, formatter:format_upload_button}
+                { name: 'action', index: 'action', width: 200, hidden: false, formatter:format_upload_button}
             ],
             ondblClickRow: function(rowid) {
                 var project_id = $("#show_all").getRowData(rowid)['project_id'];

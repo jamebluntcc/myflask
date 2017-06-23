@@ -661,6 +661,16 @@ def get_project_leader():
 
     return project_leaders
 
+def get_log_data(project_id):
+    data = []
+    cmd = "SELECT action,manager,time FROM project_log_table where project_id='%s'" %project_id
+
+    db = DBConn()
+    results = db.execute(cmd)
+    for result in results:
+        data.append(dict(result))
+
+    return data
 
 if __name__ == '__main__':
     print get_project_files('111', '111')
