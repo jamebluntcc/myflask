@@ -62,7 +62,7 @@
 		var id = $('#sample_table').jqGrid('getGridParam','selrow');
 		$("#sample_table").jqGrid('editRow',id);
 	});
-		
+
 	$(".del").unbind().bind('click', function(){
 		var id = $('#sample_table').jqGrid('getGridParam','selrow');
 		if(id){
@@ -75,7 +75,7 @@
 			current_input_row = ids.length == 0 ? '1' : parseInt(ids[ids.length-1].replace(/[^0-9]/ig,""));
 		}
 	});
-		
+
 	$("#sample_table").on('click', "input", function (){
 		current_input_row = this.parentNode.parentNode.id;
 	});

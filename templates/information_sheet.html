@@ -509,9 +509,15 @@
 	<p class="western" align="left" style="margin-right: -0.13in; margin-bottom: 0.11in; line-height: 115%">
 		<br><br>
 	</p>
+	{% if action == 'new' %}
 	<div id="confirm_button" class="center">
 		<button id="submit" type="button" class="btn btn-primary btn-lg">提交信息单</button>
 	</div>
+	{% elif role == 'manager' %}
+	<div id="confirm_button" class="center">
+		<button id="submit" type="button" class="btn btn-primary btn-lg">提交信息单</button>
+	</div>
+	{% endif %}
 	<div title="footer">
 	</div>
 </body>

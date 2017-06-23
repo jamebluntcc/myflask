@@ -100,8 +100,8 @@ $(document).ready(function(){
 
 
     $("#submit").click(function() {
-
         var status = confirm("确认提交数据？");
+        var action = $("#project_number").val() ? 'update' :'new';
         if (status) {
 
         }
@@ -109,14 +109,13 @@ $(document).ready(function(){
             return;
         }
         var all_info = get_input_data();
-        console.log(all_info);
+        //console.log(all_info);
         var error_msg = check_input_data(all_info);
         if (error_msg.length > 0) {
             alert(error_msg);
             return;
         }
         all_info = JSON.stringify(all_info);
-        var action = $("#project_number").val() ? 'update' :'new';
         ajaxSend('save_input', {'all_info': all_info, 'action': action}, function(data) {
             if (data.errcode !=0) {
                 alert(data.msg);
