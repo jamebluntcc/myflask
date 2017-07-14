@@ -2,9 +2,9 @@
 # coding=utf-8
 import random
 import os
-import Image, ImageDraw, ImageFont, ImageFilter
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
-fontType = "/home/jedrek/work_dir/my_project/myflask/FZZCHJW.TTF"
+fontType = os.path.join(os.path.dirname(__file__),'FZZCHJW.TTF')
 
 
 def create_validate_code(size=(120, 30),
@@ -110,6 +110,8 @@ def remove_old_code():
 
 def get_validate_code():
     cur_path = os.getcwd()
+    if not os.path.exists('static/code_img/'):
+        os.mkdir('static/code_img/')
     os.chdir('static/code_img/')
     remove_old_code()
     code_img = create_validate_code()

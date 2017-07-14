@@ -1,12 +1,18 @@
-#coding=utf-8
-import datetime
-import time
+# coding=utf-8
 import os
+import sys
+import time
 import xlrd
+import datetime
 from openpyxl import Workbook
 
-from db import DBConn
+reload(sys)
+sys.setdefaultencoding('utf8')
 
+from db import DBConn
+from werkzeug.security import generate_password_hash, check_password_hash
+
+'''
 table1_map = {
     '任单编号': 'any_single_num',
     '样品编号': 'sample_number',
@@ -20,19 +26,20 @@ table1_map = {
     '文库体积(ul)': 'library_volume',
     '数据量（raw data）': 'data_size'
 }
-
+'''
 
 def save_info(all_info, username, action='new'):
     db_instance = DBConn()
     try:
         project_id = save_sample_project_master_info(db_instance, all_info.get('sample_project_master_info'), username, action)
+        if action == 'new':
+            save_log_info(db_instance, username, action, project_id, msg='create new project')
+
     except Exception, e:
         print e
         return {'data': '', 'errcode': 1, 'msg': '保存失败！项目编号已经存在，请另外选择项目编号。'}
 
-    save_table_info(db_instance, all_info.get('table_data'), project_id, action)
     del all_info['sample_project_master_info']
-    del all_info['table_data']
     for key in all_info.keys():
         table_name = key.replace('_info', '')
         data_info = all_info.get(key)
@@ -43,7 +50,7 @@ def save_info(all_info, username, action='new'):
              db_instance.insert(table_name, data_info)
 
     msg = '更新成功！' if action == 'update' else '保存成功!'
-    return {'data': '', 'errcode': 0, 'msg': msg}
+    return {'data': project_id, 'errcode': 0, 'msg': msg}
 
 
 def get_project_id_by_num(db_instance, project_number):
@@ -52,32 +59,45 @@ def get_project_id_by_num(db_instance, project_number):
 
     return result[0]
 
-
-def get_project_log_by_num(db_instance, project_number):
-    cmd = "select project_log from sample_project_master where project_number=%s" % project_number
+'''
+def get_project_log_by_num(db_instance, project_id):
+    cmd = "select action from project_log_table where id=%s" % project_id
     result = db_instance.execute(cmd, get_all=False)
 
     return result[0] or ''
+'''
 
-
-def save_compare_text(selected_project, compare_data):
+def save_compare_text(project_id, all_info, current_time):
     try:
-        file_name = os.path.dirname(__file__) + '/static/export/' + selected_project + '.txt'
-        fd = open(file_name, 'w+')
-        for data in compare_data:
-            fd.write(data['comparison_name'] + '\n')
+        db = DBConn()
+        result = db.execute("select project_name from sample_project_master where id=%s" % project_id, get_all=False)
+        project_name = result[0]
+        project_dir = os.path.join(os.path.dirname(__file__), 'static/export/' + project_name)
+        if not os.path.exists(project_dir):
+            os.mkdir(project_dir)
+        group_file_name = os.path.join(project_dir, 'sample_inf' + current_time + '.txt')
+        compare_file_name = os.path.join(project_dir, 'group_compare' + current_time + '.txt')
+        sample_packet_information = all_info['sample_packet_information']
+        compare_table = all_info['compare_table']
+        fd_group_file = open(group_file_name, 'w+')
+        fd_compare_file = open(compare_file_name, 'w+')
+        fd_group_file.write(all_info['reference_genome'] + '\n')
+        for row in sample_packet_information:
+            fd_group_file.write(row['sample_group'] + '\t' + row['sample_name'] + '\n')
 
-        fd.close()
+        for row in compare_table:
+            fd_compare_file.write(row['comparison_name'] + '\t' + row['sample_group1'] + '\t' + row['sample_group2'] + '\n')
+        fd_group_file.close()
+        fd_compare_file.close()
     except Exception, e:
         print e
 
 
-def save_compare_input(all_info, username, selected_project, action='new'):
-    time = datetime.datetime.now()
+def save_compare_input(all_info, username, project_id, action='new'):
+    current_time = datetime.datetime.now()
+    save_compare_text(project_id, all_info, str(current_time))
     db_instance = DBConn()
-    project_number = selected_project.split('-')[-1]
-    project_id = get_project_id_by_num(db_instance, project_number)
-    project_log = get_project_log_by_num(db_instance, project_number)
+    #project_log = get_project_log_by_num(db_instance, project_id)
     all_info['project_id'] = project_id
     cmd = "select id from analysis_master where created_by='%s' and project_id=%s" % (username, project_id)
     result = db_instance.execute(cmd, get_all=False)
@@ -91,16 +111,18 @@ def save_compare_input(all_info, username, selected_project, action='new'):
     del all_info['sample_packet_information']
     del all_info['compare_table']
     all_info['updated_by'] = username
-    all_info['update_time'] = time
+    all_info['update_time'] = current_time
     if action == 'new':
-        all_info['create_time'] = time
+        all_info['create_time'] = current_time
         all_info['created_by'] = username
         master_id = db_instance.insert('analysis_master', all_info)
-        project_log += '\n%s: %s created compare method.\n' % (time, username)
-        db_instance.update('sample_project_master', {'id': project_id}, {'project_log': project_log})
+        save_log_info(db_instance, username, action, project_id, msg='created compare method')
+        #project_log += '\n%s: %s created compare method.\n' % (current_time, username)
+        #db_instance.update('sample_project_master', {'id': project_id}, {'project_log': project_log})
     else:
-        project_log += '\n%s: %s update compare method.\n' % (time, username)
-        db_instance.update('sample_project_master', {'id': project_id}, {'project_log': project_log})
+        save_log_info(db_instance, username, action, project_id, msg='update compare method')
+        #project_log += '\n%s: %s update compare method.\n' % (current_time, username)
+        #db_instance.update('sample_project_master', {'id': project_id}, {'project_log': project_log})
         db_instance.update('analysis_master', {'id': master_id}, all_info)
     for row in sample_packet_information:
         del row['id']
@@ -111,8 +133,6 @@ def save_compare_input(all_info, username, selected_project, action='new'):
         del row['id']
         row['master_id'] = master_id
         db_instance.insert('compare_table', row)
-
-    save_compare_text(selected_project, compare_table)
 
     msg = '更新成功！' if action == 'update' else '保存成功!'
     return {'data': '', 'errcode': 0, 'msg': msg}
@@ -132,19 +152,36 @@ def save_table_info(db_instance, table_data, project_id, action):
 
 
 def save_sample_project_master_info(db_instance, data_info, username, action):
-    time = datetime.datetime.now()
     if action == 'update':
-        cmd = "select id from sample_project_master where project_number=%s" % data_info['project_number']
+        cmd = "select id from sample_project_master where project_number='%s'" % data_info['project_number']
         result = db_instance.execute(cmd, get_all=False)
-        preject_id = result[0]
-        data_info['project_log'] += "\n%s: %s update this project.\n" % (time, username)
-        db_instance.update('sample_project_master', {'id': preject_id}, data_info)
-        return preject_id
+        project_id = result[0]
+        #data_info['project_log'] += "\n%s: %s update this project.\n" % (time, username)
+        data_info['project_leader'] = username
+        db_instance.update('sample_project_master', {'id': project_id}, data_info)
+        save_log_info(db_instance, username, action, project_id, msg='update this project')
+        return project_id
     else:
+        cmd = "select max(project_number) from sample_project_master"
+        result = db_instance.execute(cmd, get_all=False)
+        name_list = result[0].split('-')
+        new_project_num = name_list[0] + '-' + str(int(name_list[1]) + 1)
+        data_info['project_number'] = new_project_num
         data_info['created_by'] = username
         data_info['create_time'] = datetime.datetime.now()
-        data_info['project_log'] = "%s: %s create new project.\n" % (time, username)
+        #data_info['project_log'] = "%s: %s create new project.\n" % (time, username)
         return db_instance.insert('sample_project_master', data_info)
+
+def save_log_info(db_instance, username, action, project_id, msg):
+    time = datetime.datetime.now()
+    if action == 'update':
+        insert_dict = dict(project_id=project_id,action=msg,
+                           manager=username,time=time)
+        db_instance.insert('project_log_table',insert_dict)
+    else:
+        insert_dict = dict(project_id=project_id,action=msg,
+                          manager=username,time=time)
+        db_instance.insert('project_log_table',insert_dict)
 
 
 def show_all_data(username, role='user'):
@@ -182,7 +219,7 @@ def get_all_user_data():
     return data
 
 
-def get_one_project_data(project_number):
+def get_one_project_data(project_id):
     cmd = """select * from sample_project_master spm,
              sample_species ss,
              sample_type st,
@@ -194,28 +231,18 @@ def get_one_project_data(project_number):
              dsst.project_id=spm.id and
              rsst.project_id=spm.id and
              other.project_id=spm.id and
-             spm.project_number=%s""" % project_number
+             spm.id=%s""" % project_id
     db = DBConn()
     result = db.execute(cmd, get_all=False)
     data = dict(result)
-    cmd = "select * from sample_info_detail where project_id=%s" % result['project_id']
-    table_data = []
-    results = db.execute(cmd)
-    for result in results:
-        table_data.append(dict(result))
-
-    data['table_data'] = table_data
-
     return data
 
 
-def get_analysis_data(username, role, selected_project):
+def get_analysis_data(username, role, project_id):
 
-    if not selected_project:
+    if not project_id:
         return {}
-    project_number = selected_project.split('-')[-1]
-    cmd = """select a.* from analysis_master a,sample_project_master s
-          where a.project_id=s.id and s.project_number=%s""" % project_number
+    cmd = """select * from analysis_master where project_id=%s""" % project_id
     db = DBConn()
     result = db.execute(cmd, get_all=False)
     return dict(result) if result else {}
@@ -228,18 +255,39 @@ def phone_check(s):
     return True if len(s) == 11 and s.isdigit() and s[:3] in phone_prefix else False
 
 
+# def get_user_role(username, password=''):
+#     db = DBConn()
+#     if phone_check(username):
+#         cmd = "select role,status from user_info where tel='%s'" % username
+#     else:
+#         cmd = "select role,status from user_info where username='%s'" % username
+#     if password:
+#         cmd += " and password='%s'" % password
+#     result = db.execute(cmd, get_all=False)
+#     role = result[0] if result else ''
+#     status = result[1] if result else ''
+#     return role, status
+
+
 def get_user_role(username, password=''):
     db = DBConn()
     if phone_check(username):
-        cmd = "select role,status from user_info where tel='%s'" % username
+        cmd = "select role,status,password from user_info where tel='%s'" % username
     else:
-        cmd = "select role,status from user_info where username='%s'" % username
-    if password:
-        cmd += " and password='%s'" % password
+        cmd = "select role,status,password from user_info where username='%s'" % username
     result = db.execute(cmd, get_all=False)
-    role = result[0] if result else ''
-    status = result[1] if result else ''
-    return role, status
+    password_hash = result[2] if result else ''
+    if password:
+        if check_password_hash(password_hash, password):
+            role = result[0] if result else ''
+            status = result[1] if result else ''
+            return role, status
+        else:
+            return '', ''
+    else:
+        role = result[0] if result else ''
+        status = result[1] if result else ''
+        return role, status
 
 
 def get_other_info(username):
@@ -273,9 +321,11 @@ def change_password(info):
     db = DBConn()
     cmd = "select password from user_info where username='%s'" % username
     result = db.execute(cmd, get_all=False)
-    if result and result[0] == info['old_passwd'] and info['new_passwd'] != info['old_passwd']:
-        db.update('user_info', {'username': username}, {'password': info['new_passwd'],
+    if result and check_password_hash(result[0], info['old_passwd']) and info['new_passwd'] != info['old_passwd']:
+        password_hash = generate_password_hash(info['new_passwd'])
+        db.update('user_info', {'username': username}, {'password': password_hash,
                                                         'update_time': datetime.datetime.now()})
+
         return {'data': '', 'errcode': 0, 'msg': '更新成功！'}
     elif result and result[0] != info['old_passwd']:
         return {'data': '', 'errcode': 1, 'msg': '旧密码错误！'}
@@ -312,6 +362,7 @@ def save_user_info(info):
     elif tel_result:
         ret = fail_info(tel_result, '电话号码')
     else:
+        info['password'] = generate_password_hash(info.get('password'))
         db.insert('user_info', info)
         ret = {'data': '', 'errcode': 0, 'msg': '注册成功：等待审核！'}
 
@@ -330,11 +381,9 @@ def get_detail_sample_data(project_number):
     return data
 
 
-def get_analysis_table_data(username, selected_project):
+def get_analysis_table_data(project_id):
     data = {}
     db = DBConn()
-    project_number = selected_project.split('-')[-1]
-    project_id = get_project_id_by_num(db, project_number)
     cmd = """select info.* from sample_packet_information info, analysis_master m
                   where m.id=info.master_id and m.project_id=%s""" % project_id
     results = db.execute(cmd)
@@ -359,14 +408,17 @@ def admin_save_user_info(username, status):
 
 def get_project_number_list(username, user_role):
     if user_role == 'manager':
-        cmd = "select concat(project_name, '-', project_number) from sample_project_master where project_leader='%s'" % username
+        cmd = "select id, concat(project_name, '-', project_number) from sample_project_master where project_leader='%s'" % username
     elif user_role == 'user':
-        cmd = "select concat(project_name, '-', project_number) from sample_project_master where created_by='%s'" % username
+        cmd = "select id, concat(project_name, '-', project_number) from sample_project_master where created_by='%s'" % username
 
     db = DBConn()
     results = db.execute(cmd)
+    data = {}
+    for result in results:
+        data[result[0]] = result[1]
 
-    return [i[0] for i in results]
+    return data
 
 
 def get_manager_list():
@@ -566,6 +618,76 @@ def get_project_files(project_number, project_name):
     return {'data': file_list, 'errcode': 0, 'msg': ""}
 
 
+def save_sample_data(project_id, data):
+    try:
+        table_name = "sample_table"
+        db = DBConn()
+        db.delete(table_name, {'project_id': project_id})
+        for row in data:
+            row['project_id'] = project_id
+            db.insert(table_name, row)
+        ret = {'data': '', 'errcode': 0, 'msg': ''}
+    except Exception, e:
+        import traceback
+        traceback.print_exc()
+        ret = {'data': '', 'errcode': 1, 'msg': '%s DB issue!' % e}
+
+    return ret
+
+
+def get_sample_list_by_project(project_id):
+    sample_list = {}
+    db = DBConn()
+    cmd = "SELECT id_alias,sample_name FROM SEQ_SA_INFO.sample_info_detail where project_id=%s" % project_id
+    results = db.execute(cmd)
+    for result in results:
+        sample_list[result[0]] = result[1]
+
+    return sample_list
+
+
+def get_sample_table_data(project_id):
+    all_project_sample_data = []
+    db = DBConn()
+    cmd = "SELECT * FROM SEQ_SA_INFO.sample_table where project_id=%s" % project_id
+    results = db.execute(cmd)
+    for result in results:
+        all_project_sample_data.append(dict(result))
+
+    return all_project_sample_data
+
+
+def get_project_info(project_id):
+    db = DBConn()
+    cmd = "SELECT project_name, project_number FROM sample_project_master where id=%s" % project_id
+    result = db.execute(cmd, get_all=False)
+
+    return dict(result)
+
+'''
+add by chencheng
+'''
+
+def get_project_leader():
+    db = DBConn()
+    cmd = "SELECT username FROM user_info where role='manager'"
+    results = db.execute(cmd)
+    project_leaders = []
+    for result in results:
+        project_leaders.append(result[0])
+
+    return project_leaders
+
+def get_log_data(project_id):
+    data = []
+    cmd = "SELECT * FROM project_log_table where project_id='%s'" %project_id
+
+    db = DBConn()
+    results = db.execute(cmd)
+    for result in results:
+        data.append(dict(result))
+
+    return data
+
 if __name__ == '__main__':
-    # print transfer_excel_to_json('/home/chenjialin/下载/Table.1.xls')
     print get_project_files('111', '111')

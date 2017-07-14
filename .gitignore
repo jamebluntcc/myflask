@@ -2,3 +2,9 @@
 *.pyc
 *pid
 *.sock
+
+#ignore pycharm files
+.idea/*
+
+#ignore static code_img file
+static/code_img/*

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>OnMath</title>
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/css/user_read.css" rel="stylesheet">
+    <script src="static/js/jquery-2.0.0.min.js"></script>
+    <script src="static/js/main.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header clearfix">
+          <!--<nav>-->
+            <!--<ul class="nav nav-pills pull-right">-->
+              <!--<li role="presentation"><a href="#">主页</a></li>-->
+              <!--<li role="presentation"><a href="#">关于</a></li>-->
+              <!--<li role="presentation"><a href="#">联系我们</a></li>-->
+            <!--</ul>-->
+            <!--<img style="max-width:200px" src="static/image/logo.jpg" alt="logo">-->
+          <!--</nav>-->
+        </div>
+        <div>
+            <h4 class="text-center"><strong>填写须知</strong></h4>
+            <br>
+            <ol style="font-size:16px">
+                <li><p>为便于实验人员快速进行样品的检测、处理，请务必完整填写以下各部分内容，如有不清楚的填写部分，请与销售联系；如有不能填写部分，请注明原因，尽量不要在表中留有空白（标注*务必填写完整）。</p></li>
+                <li><p>样品如果做de novo分析，请先与项目管理联系确认本次送样用于构建多大的文库。</p></li>
+                <li><p>对于已结题项目的剩余样品，合作伙伴需在收到项目结题报告后3个月内与项目管理协商样品处理事宜，否则在结题报告递交合作伙伴3个月后由我们全权对样品进行处理。</p></li>
+                <li><p>样品在检测报告发出后15天内仍未签合同立项，合作伙伴没有提出保存或返样要求的，我们有权对样品进行处理。</p></li>
+                <li><p>我们接收到样品后，DNA或文库保存于-20℃冰箱，RNA或组织保存于-80℃冰箱，客户样品如需特殊条件存放，请在信息单中备注说明正确保存温度。</p></li>
+                <li><p>如果样品体积太小（小于25 μL）我们可能根据实验情况进行原管稀释后检测，如果样品不是保存于1.5/2.0 mL EP管我们可能根据实验情况进行转管后检测。</p></li>
+            </ol>
+        </div>
+        <br>
+          <br>
+            <br>
+              <br>
+                <br>
+                  <br>
+                    <br>
+
+        <div class="checkbox">
+            <label>
+                <input id="read_me" type="checkbox"><b>我已阅读并接受此须知中的所有条款</b>
+            </label>
+            <p>
+              <button id="submit" type="button" class="confirm btn btn-primary btn-lg">下一步</button>
+            </p>
+        </div>
+        <footer class="footer">
+          <div class="row">
+            <div class="col-lg-6">
+              <address>
+                <strong><p>&copy; 2017 成都昂迈思科技有限公司, Inc.</P></strong>
+                成都市高新区天府大道中段500号东方希望天祥1栋43-22<br>
+                <abbr title="Phone">P:</abbr>028 - 68636933
+              </address>
+            </div>
+            <div class="col-lg-6">
+              <address style="margin-left:300px">
+                <strong>邮箱</strong><br>
+                   <a href="mailto:#">market@onmath.cn（市场）</a><br>
+                   <a href="mailto:#">IT@onmath.cn（技术）</a><br>
+                   <a href="mailto:#">hr@onmath.cn（人力）</a>
+              </address>
+            </div>
+              </div>
+        </footer>
+    </div>
+    <!-- /container -->
+</body>
+<script>
+      $(document).ready(function(){
+          $("#submit").click(function(){
+            var read_me = $("#read_me").is(":checked");
+            if(!read_me){
+              alert("您还未同意接受此须知的所有条款！");
+              return;
+            }else{
+               $('#page_detail').render('/get_input_info');
+            }
+          });
+      });
+</script>
+</html>

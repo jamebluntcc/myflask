@@ -22,40 +22,50 @@ def main():
         return redirect('/login')
     user_role, status = interface.get_user_role(username)
     (e_mail, tel, company, field, customer_name) = interface.get_other_info(username)
-    project_num_list = ['']
-    project_num_list += interface.get_project_number_list(username, user_role)
-    return render_template('main2.html', username=username,
+    project_info = interface.get_project_number_list(username, user_role)
+    project_info[''] = ''
+    return render_template('main.html', username=username,
                            role=user_role,
                            e_mail=e_mail,
                            tel=tel,
                            company=company,
                            customer_name=customer_name,
                            field=field,
-                           project_num_list=project_num_list)
+                           project_info=project_info)
 
 
 @app.route('/save_input', methods=['GET'])
 def save_info():
-    username = session.get('login_id')
-    if not username:
-        return redirect('/login')
-    all_info = request.args.get('all_info')
-    all_info = json.loads(all_info)
-    action = request.args.get('action')
+    try:
+        username = session.get('login_id')
+        if not username:
+            return redirect('/login')
+        all_info = request.args.get('all_info')
+        all_info = json.loads(all_info)
+        action = request.args.get('action')
 
-    return jsonify(interface.save_info(all_info, username, action))
+        return jsonify(interface.save_info(all_info, username, action))
+    except Exception, e:
+        import traceback
+        traceback.print_exc()
 
 
-@app.route('/save_compare_input', methods=['GET'])
+@app.route('/save_compare_input', methods=['POST'])
 def save_compare_input():
-    selected_project = request.args.get('selected_project')
-    username = session.get('login_id')
-    if not username:
-        return redirect('/login')
-    all_info = request.args.get('all_info')
-    all_info = json.loads(all_info)
+    try:
+        project_id = request.form['selected_project']
+        username = session.get('login_id')
+        if not username:
+            return redirect('/login')
 
-    return jsonify(interface.save_compare_input(all_info, username, selected_project))
+        all_info = request.form['all_info']
+        all_info = json.loads(all_info)
+
+        return jsonify(interface.save_compare_input(all_info, username, project_id))
+    except Exception, e:
+        print e
+        import traceback
+        traceback.print_exc()
 
 
 @app.route('/login', methods=['GET'])
@@ -83,10 +93,12 @@ def check_login():
         return jsonify({'data': '', 'errcode': 1, 'msg': '管理员拒绝通过审核或者该帐号已被禁用， 详情请联系系统管理员！'})
     elif user_role == 'user':
         session['login_id'] = username
+        session['role'] = user_role
         return jsonify({'data': '', 'errcode': 0, 'msg': '登录成功！'})
     elif user_role == 'manager':
         # TODO: show manager page
         session['login_id'] = username
+        session['role'] = user_role
         return jsonify({'data': '', 'errcode': 0, 'msg': '登录成功！'})
 
 
@@ -105,10 +117,12 @@ def analysis():
     user_role, status = interface.get_user_role(username)
     data = interface.get_analysis_data(username, user_role, selected_project)
     action = 'update' if data else 'new'
-    project_list = interface.get_project_number_list(username, user_role)
     data['selected_project'] = selected_project
-    return render_template('analysis.html', data=data, action=action,
-                           project_list=project_list, selected_project=selected_project)
+    sample_list = interface.get_sample_list_by_project(selected_project)
+    return render_template('analysis.html', data=data,
+                           action=action,
+                           selected_project=selected_project,
+                           sample_list=sample_list)
 
 
 @app.route('/register', methods=['GET'])
@@ -123,6 +137,9 @@ def save_user_info():
         data = interface.save_user_info(json.loads(user_info))
     except Exception, e:
         print e
+        import traceback
+        traceback.print_exc()
+
     return jsonify(data)
 
 
@@ -143,6 +160,7 @@ def change_password():
         data = interface.change_password(json.loads(user_info))
     except Exception, e:
         print e
+        sys.exit(1)
     return jsonify(data)
 
 
@@ -152,7 +170,7 @@ def validate_code():
         code = get_validate_code()
     except Exception, e:
         print e
-
+        sys.exit(1)
     return code
 
 
@@ -175,19 +193,25 @@ def get_all_user_data():
     return jsonify({'data': data, 'errcode': 0, 'msg': 'Success'})
 
 
-@app.route('/input_info')
-def input_info():
+@app.route('/get_input_info', methods=['GET', 'POST'])
+def get_input_info():
     username = session.get('login_id')
+    role = session.get('role')
     if not username:
         return redirect('/login')
-    user_role, status = interface.get_user_role(username)
+    # user_role, status = interface.get_user_role(username)
     action = request.args.get('action')
     action = 'new' if not action else action
-    project_number = request.args.get('project_number')
-    data = interface.get_one_project_data(project_number) if project_number else {}
-    manager_list = interface.get_manager_list()
+    if action == 'new':
+        project_leaders = interface.get_project_leader()
+    project_id = request.args.get('project_id')
+    data = interface.get_one_project_data(project_id) if project_id else {'project_leaders':project_leaders}
+    return render_template('information_sheet.html', data=data, action=action,role=role)
 
-    return render_template('user_input.html', data=data, action=action, role=user_role, manager_list=manager_list)
+
+@app.route('/save_sample_row', methods=['GET', 'POST'])
+def save_sample_row():
+    return jsonify({'data': [], 'errcode': 0, 'msg': 'Success'})
 
 
 @app.route('/get_detail_sample_data', methods=['GET', 'POST'])
@@ -202,11 +226,21 @@ def get_detail_sample_data():
 
 @app.route('/get_analysis_table_data', methods=['GET', 'POST'])
 def get_analysis_table_data():
-    selected_project = request.args.get('selected_project')
+    project_id = request.args.get('selected_project')
     username = session.get('login_id')
     if not username:
         return redirect('/login')
-    data = interface.get_analysis_table_data(username, selected_project)
+    data = interface.get_analysis_table_data(project_id)
+    return jsonify({'data': data, 'errcode': 0, 'msg': 'Success'})
+
+
+@app.route('/get_sample_table_data', methods=['GET', 'POST'])
+def get_sample_table_data():
+    project_id = request.args.get('project_id')
+    username = session.get('login_id')
+    if not username:
+        return redirect('/login')
+    data = interface.get_sample_table_data(project_id)
     return jsonify({'data': data, 'errcode': 0, 'msg': 'Success'})
 
 
@@ -238,9 +272,9 @@ def select_project():
     if not username:
         return redirect('/login')
     user_role, status = interface.get_user_role(username)
-    project_list = interface.get_project_number_list(username, user_role)
+    project_info = interface.get_project_number_list(username, user_role)
 
-    return render_template('select_project.html', project_list=project_list)
+    return render_template('select_project.html', project_info=project_info)
 
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -272,9 +306,41 @@ def export_user_info():
 
 @app.route('/get_upload_page', methods=['GET', 'POST'])
 def get_upload_page():
-    project_number = request.args.get('project_number')
-    project_name = request.args.get('project_name')
-    return render_template('upload_project_file.html', project_number=project_number, project_name=project_name)
+    project_id = request.args.get('project_id')
+    project_info = interface.get_project_info(project_id)
+    return render_template('upload_project_file.html', project_number=project_info['project_number'],
+                           project_name=project_info['project_name'], project_id=project_id)
+
+
+@app.route('/get_sample_page', methods=['GET', 'POST'])
+def get_sample_page():
+    try:
+        project_id = request.args.get('project_id')
+        return render_template('sample.html', project_id=project_id)
+    except Exception, e:
+        import traceback
+        traceback.print_exc()
+
+
+@app.route('/get_log_data', methods=['GET', 'POST'])
+def get_log_data():
+        project_id = request.args.get('project_id')
+        username = session.get('login_id')
+        if not username:
+            return redirect('/login')
+        data = interface.get_log_data(project_id)
+        return jsonify({'data': data, 'errcode': 0, 'msg': 'Success'})
+
+
+@app.route('/get_log_page', methods=['GET', 'POST'])
+def get_log_page():
+    try:
+        project_id = request.args.get('project_id')
+        project_info = interface.get_project_info(project_id)
+        return render_template('log_table.html', project_name=project_info['project_name'],project_id=project_id)
+    except Exception, e:
+        import traceback
+        traceback.print_exc()
 
 
 @app.route('/get_project_files', methods=['GET', 'POST'])
@@ -285,5 +351,24 @@ def get_project_files():
     return jsonify(interface.get_project_files(project_number, project_name))
 
 
+@app.route('/save_sample_table', methods=['POST'])
+def save_sample_table():
+    try:
+        data = request.form['sample_table_data']
+        data = json.loads(data) if data else []
+        project_id = request.form['project_id']
+        interface.save_sample_data(project_id, data)
+    except Exception, e:
+        import traceback
+        traceback.print_exc()
+
+    return jsonify({'data': '保存成功!', 'errcode': 0, 'msg': 'Success'})
+
+
+@app.route('/get_user_read', methods=['POST', 'GET'])
+def get_user_read():
+    return render_template('user_read.html')
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=50000, debug=False)
+    app.run(host='0.0.0.0', port=5000, debug=True)

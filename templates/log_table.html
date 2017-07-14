@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="static/css/ui.jqgrid.css" />
+		<link rel="stylesheet" href="static/css/jquery-ui-1.8.16.custom.css" />
+		<script type="text/javascript" src="static/js/jquery-2.0.0.min.js"></script>
+		<script type="text/javascript" src="static/js/jquery.jqGrid.src.js"></script>
+		<script type="text/javascript" src="static/js/grid.locale-cn.js"></script>
+		<script type="text/javascript" src="static/js/sample.js"></script>
+		<script type="text/javascript" src="static/js/xlsx.core.min.js"></script>
+		<script src="static/js/main.js"></script>
+	<title></title>
+</head>
+<body>
+  <span class="help-block"><b>当前项目:{{ project_name }}</b></span>
+
+<table id="log_table"></table>
+
+</body>
+<script>
+	var project_id = {{ project_id }};
+	var table_title = '项目log表';
+  $("#log_table").jqGrid({
+      datatype: 'local',
+      height: 100,
+      colNames: ['id', 'project_id', '动作', '操作人', '改动时间'],
+      colModel: [
+          { name: 'id', index: 'id', width: 65, editable:false, hidden:true},
+          { name: 'project_id', index: 'project_id', width: 65, editable:false, hidden:true},
+          { name: 'action', index: 'action', width: 120, editable:false},
+          { name: 'manager', index: 'manager', width: 65, editable:false},
+          { name: 'time', index: 'time', width: 65, editable:false}
+      ],
+      caption: table_title
+  });
+	function show_log_table() {
+		ajaxSend('get_log_data', {'project_id': project_id}, function(data) {
+			if (data.errcode !=0) {
+				alert(data.msg);
+			}
+			else {
+				var ret_data = data.data;
+				var table_obj = $("#log_table");
+				for (var i in ret_data) {
+					i = parseInt(i);
+					table_obj.addRowData(i+1, ret_data[i]);
+				}
+			}
+		});
+	}
+
+	show_log_table();
+</script>
+</html>

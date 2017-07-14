@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="static/css/ui.jqgrid.css" />
+		<link rel="stylesheet" href="static/css/jquery-ui-1.8.16.custom.css" />
+		<script type="text/javascript" src="static/js/jquery-2.0.0.min.js"></script>
+		<script type="text/javascript" src="static/js/jquery.jqGrid.src.js"></script>
+		<script type="text/javascript" src="static/js/grid.locale-cn.js"></script>
+		<script type="text/javascript" src="static/js/sample.js"></script>
+		<script type="text/javascript" src="static/js/xlsx.core.min.js"></script>
+		<script src="static/js/main.js"></script>
+	<title></title>
+</head>
+<body>
+  <span class="help-block"><b>样品详细信息：（请填写下表，如果您的样品数量较多建议您填写电子版表格后直接上传）</b>
+	  <a href="static/download/sample_example.xlsx" style="font-size: smaller ">点击下载模板</a>
+	  <input type="file" accept=" application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" id="upload_excel"/>
+  </span>
+  <input type="button" class="add" value="增加行"/>
+  <input type="button" class="del" value="删除行"/>
+  <input type="button" class="edit" value="编辑行"/>
+  <input type="button" class="save" value="保存样品表"/>
+
+<table id="sample_table"></table>
+
+<button id="submit">提交样品表</button>
+</body>
+<script>
+	var project_id = {{ project_id }};
+	var table_map = {
+		'样品名称':'sample_name',
+		'物种':'sepcies',
+		'管数':'product_num',
+		'建库类型':'library_type',
+		'浓度(ng/uL)':'concentration',
+		'体积(ul)':'volume',
+		'总量(ug)':'data_quantity',
+		'片段长度(bp)':'fragment_length',
+		'OD260/280':'od_260_or_280',
+		'OD260/230':'od_260_or_230',
+		'备注':'comment'
+	};
+
+	$('#upload_excel').bind('change', handleFile);
+
+	$(".add").unbind().bind('click', function(){
+		var jq_obj = $("#sample_table");
+		var ids= jq_obj.getDataIDs();
+		var new_row_id = ids.length == 0 ? '1' : parseInt(ids[ids.length-1].replace(/[^0-9]/ig,""))+1;
+		var id = jq_obj.jqGrid('getGridParam','selrow');
+		if (id) {jq_obj.saveRow( id, '', '/save_sample_row');}
+		jq_obj.addRowData(new_row_id, {});
+		jq_obj.editRow(new_row_id);
+		jq_obj.setSelection(new_row_id);
+		current_input_row = new_row_id;
+	});
+
+	$(".edit").unbind().bind('click', function(){
+		var id = $('#sample_table').jqGrid('getGridParam','selrow');
+		$("#sample_table").jqGrid('editRow',id);
+	});
+
+	$(".del").unbind().bind('click', function(){
+		var id = $('#sample_table').jqGrid('getGridParam','selrow');
+		if(id){
+			$("#sample_table").delRowData(id);
+		}else{
+			if(current_input_row) {
+			$("#sample_table").delRowData(current_input_row);
+			}
+			var ids= $("#sample_table").getDataIDs();
+			current_input_row = ids.length == 0 ? '1' : parseInt(ids[ids.length-1].replace(/[^0-9]/ig,""));
+		}
+	});
+
+	$("#sample_table").on('click', "input", function (){
+		current_input_row = this.parentNode.parentNode.id;
+	});
+
+	$(".save").unbind().bind('click', function() {
+		save_sample_table();
+	});
+
+	$("#submit").unbind().bind('click', function () {
+		save_sample_table();
+		var status = confirm("确认提交样品表信息?");
+		if (status) {
+			var sample_table_data = $("#sample_table").getRowData();
+			var params = {'sample_table_data': JSON.stringify(sample_table_data), 'project_id': project_id};
+			ajaxSend('/save_sample_table', params, function (data) {
+				if (data.errcode !=0) {
+                    alert('保存失败!');
+                }
+                else {
+                    alert(data.msg);
+                    window.location.href='/';
+                }
+			}, 'POST');
+		}
+
+
+	});
+
+	function handleFile(e) {
+        var files = e.target.files;
+        var i,f;
+        for (i = 0, f = files[i]; i != files.length; ++i) {
+            var reader = new FileReader();
+            var name = f.name;
+            reader.onload = function(e) {
+                var data = e.target.result;
+
+                var workbook = XLSX.read(data, {type: 'binary'});
+                var sheet_name_list = workbook.SheetNames;
+                var result = [];
+                var headItem=[];
+                var dataItem=[];
+                var dataFormulae=[];
+                var dataCsv=[];
+
+                sheet_name_list.forEach(function(y) {
+                    var worksheet = workbook.Sheets[y];
+                    var json = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+                    var formulae = XLSX.utils.sheet_to_formulae(workbook.Sheets[y]);
+                    var csv = XLSX.utils.sheet_to_formulae(workbook.Sheets[y]);
+                    if(json.length > 0){
+                        result=json;
+                    }
+                });
+				var transform_json=[];
+                $.each(result,function (i,val) {
+					var temp_obj={};
+					for(value in table_map){
+						if(val[value]){
+							temp_obj[table_map[value]] = val[value];
+						}
+					}
+					transform_json.push(temp_obj);
+                })
+				for(var i=0;i<=transform_json.length;i++){
+					$("#sample_table").addRowData(i+1,transform_json[i]);
+				};
+            };
+            reader.readAsBinaryString(f);
+        }
+        $('#upload_excel').val('');
+    }
+
+	function save_sample_table() {
+		var ids = $("#sample_table").getDataIDs();
+		for (var i in ids) {
+			$("#sample_table").saveRow(ids[i], '', 'save_row');
+		}
+	}
+
+	function show_old_sample() {
+		ajaxSend('get_sample_table_data', {'project_id': project_id}, function(data) {
+			if (data.errcode !=0) {
+				alert(data.msg);
+			}
+			else {
+				var ret_data = data.data;
+				var table_obj = $("#sample_table");
+				for (var i in ret_data) {
+					i = parseInt(i);
+					table_obj.addRowData(i+1, ret_data[i]);
+				}
+			}
+		});
+	}
+
+	show_old_sample();
+</script>
+</html>

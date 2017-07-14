@@ -203,3 +203,70 @@ ADD COLUMN `notes` VARCHAR(200) NULL DEFAULT '' AFTER `field`;
 
 ALTER TABLE `SEQ_SA_INFO`.`user_info`
 ADD COLUMN `customer_name` VARCHAR(45) NULL DEFAULT '' AFTER `username`;
+
+
+### 2017-05-30
+CREATE TABLE `sample_table` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sample_id` char(50) NOT NULL ,
+  `project_id` int(11) NOT NULL,
+  `sample_name` char(50) DEFAULT NULL,
+  `sepcies` char(50) DEFAULT NULL,
+  `product_num` char(50) DEFAULT NULL,
+  `library_type` char(50) DEFAULT NULL,
+  `concentration` char(50) DEFAULT NULL,
+  `volume` char(50) DEFAULT NULL,
+  `data_quantity` char(50) DEFAULT NULL,
+  `fragment_length` char(50) DEFAULT NULL,
+  `od_260_or_280` char(50) DEFAULT NULL,
+  `od_260_or_230` char(50) DEFAULT NULL,
+  `comment` char(50) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `sample_table_id_uindex` (`id`),
+  UNIQUE KEY `sample_table_sample_id_uindex` (`sample_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+### 2017-06-03
+ALTER TABLE `SEQ_SA_INFO`.`analysis_master`
+DROP COLUMN `refer_Prov_customer`,
+DROP COLUMN `refer_null`,
+DROP COLUMN `refer_ucsc`,
+DROP COLUMN `refer_ncbi`,
+DROP COLUMN `refer_ensemble`,
+ADD COLUMN `reference_genome` VARCHAR(45) NULL DEFAULT '' AFTER `project_id`;
+
+ALTER TABLE `SEQ_SA_INFO`.`sample_packet_information`
+ADD COLUMN `sample_id` INT(11) NULL DEFAULT NULL AFTER `master_id`;
+
+ALTER TABLE `SEQ_SA_INFO`.`sample_packet_information`
+CHANGE COLUMN `sample_id` `sample_id` VARCHAR(45) NULL DEFAULT NULL ;
+
+
+ALTER TABLE `SEQ_SA_INFO`.`sample_info_detail`
+ADD COLUMN `id_alias` VARCHAR(45) NULL DEFAULT NULL AFTER `id`,
+ADD UNIQUE INDEX `id_alias_UNIQUE` (`id_alias` ASC);
+
+
+ALTER TABLE `SEQ_SA_INFO`.`sample_packet_information`
+CHANGE COLUMN `sample_id` `sample_id_alias` VARCHAR(45) NULL DEFAULT NULL ;
+
+ALTER TABLE `SEQ_SA_INFO`.`compare_table`
+CHANGE COLUMN `sample1` `sample_group1` VARCHAR(45) NULL DEFAULT '' ,
+CHANGE COLUMN `sample2` `sample_group2` VARCHAR(45) NULL DEFAULT '' ;
+
+ALTER TABLE `SEQ_SA_INFO`.`user_info`
+CHANGE COLUMN `password` `password` VARCHAR(200) NOT NULL ;
+
+ALTER TABLE `SEQ_SA_INFO`.`sample_project_master`
+CHANGE COLUMN `project_number` `project_number` VARCHAR(45) NOT NULL ;
+#2017-06-23
+CREATE TABLE `SEQ_SA_INFO`.`project_log_table` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `project_id` INT NOT NULL,
+  `action` VARCHAR(45) NULL,
+  `time` VARCHAR(45) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC);
+
+  ALTER TABLE `SEQ_SA_INFO`.`sample_project_master`
+  DROP COLUMN `sale_name`;
