@@ -316,6 +316,7 @@ def get_upload_page():
 def get_sample_page():
     try:
         project_id = request.args.get('project_id')
+        #user_role = session.get('role')
         return render_template('sample.html', project_id=project_id)
     except Exception, e:
         import traceback
@@ -354,10 +355,11 @@ def get_project_files():
 @app.route('/save_sample_table', methods=['POST'])
 def save_sample_table():
     try:
+        username = session.get('login_id')
         data = request.form['sample_table_data']
         data = json.loads(data) if data else []
         project_id = request.form['project_id']
-        interface.save_sample_data(project_id, data)
+        interface.save_sample_data(project_id, data, username)
     except Exception, e:
         import traceback
         traceback.print_exc()

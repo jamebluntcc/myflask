@@ -28,12 +28,13 @@ table1_map = {
 }
 '''
 
+
 def save_info(all_info, username, action='new'):
     db_instance = DBConn()
     try:
         project_id = save_sample_project_master_info(db_instance, all_info.get('sample_project_master_info'), username, action)
         if action == 'new':
-            save_log_info(db_instance, username, action, project_id, msg='create new project')
+            save_log_info(db_instance, username, project_id, msg='create new project')
 
     except Exception, e:
         print e
@@ -116,11 +117,11 @@ def save_compare_input(all_info, username, project_id, action='new'):
         all_info['create_time'] = current_time
         all_info['created_by'] = username
         master_id = db_instance.insert('analysis_master', all_info)
-        save_log_info(db_instance, username, action, project_id, msg='created compare method')
+        save_log_info(db_instance, username, project_id, msg='created compare method')
         #project_log += '\n%s: %s created compare method.\n' % (current_time, username)
         #db_instance.update('sample_project_master', {'id': project_id}, {'project_log': project_log})
     else:
-        save_log_info(db_instance, username, action, project_id, msg='update compare method')
+        save_log_info(db_instance, username, project_id, msg='update compare method')
         #project_log += '\n%s: %s update compare method.\n' % (current_time, username)
         #db_instance.update('sample_project_master', {'id': project_id}, {'project_log': project_log})
         db_instance.update('analysis_master', {'id': master_id}, all_info)
@@ -159,7 +160,7 @@ def save_sample_project_master_info(db_instance, data_info, username, action):
         #data_info['project_log'] += "\n%s: %s update this project.\n" % (time, username)
         data_info['project_leader'] = username
         db_instance.update('sample_project_master', {'id': project_id}, data_info)
-        save_log_info(db_instance, username, action, project_id, msg='update this project')
+        save_log_info(db_instance, username, project_id, msg='update this project')
         return project_id
     else:
         cmd = "select max(project_number) from sample_project_master"
@@ -172,17 +173,12 @@ def save_sample_project_master_info(db_instance, data_info, username, action):
         #data_info['project_log'] = "%s: %s create new project.\n" % (time, username)
         return db_instance.insert('sample_project_master', data_info)
 
-def save_log_info(db_instance, username, action, project_id, msg):
-    time = datetime.datetime.now()
-    if action == 'update':
-        insert_dict = dict(project_id=project_id,action=msg,
-                           manager=username,time=time)
-        db_instance.insert('project_log_table',insert_dict)
-    else:
-        insert_dict = dict(project_id=project_id,action=msg,
-                          manager=username,time=time)
-        db_instance.insert('project_log_table',insert_dict)
 
+def save_log_info(db_instance, username, project_id, msg):
+    time = datetime.datetime.now()
+    insert_dict = dict(project_id=project_id, action=msg,
+                           manager=username, time=time)
+    db_instance.insert('project_log_table', insert_dict)
 
 def show_all_data(username, role='user'):
     data = []
@@ -618,14 +614,23 @@ def get_project_files(project_number, project_name):
     return {'data': file_list, 'errcode': 0, 'msg': ""}
 
 
-def save_sample_data(project_id, data):
+def save_sample_data(project_id, data, username):
     try:
         table_name = "sample_table"
         db = DBConn()
+        result = db.execute("select * from %s where project_id='%s'" %(table_name,project_id))
+        if result:
+            action = 'update'
+        else:
+            action = 'new'
         db.delete(table_name, {'project_id': project_id})
         for row in data:
             row['project_id'] = project_id
             db.insert(table_name, row)
+        if action == 'update':
+            save_log_info(db, username, project_id, msg='update sample table')
+        else:
+            save_log_info(db, username, project_id, msg='create sample table')
         ret = {'data': '', 'errcode': 0, 'msg': ''}
     except Exception, e:
         import traceback
@@ -664,9 +669,11 @@ def get_project_info(project_id):
 
     return dict(result)
 
+
 '''
 add by chencheng
 '''
+
 
 def get_project_leader():
     db = DBConn()
@@ -678,9 +685,10 @@ def get_project_leader():
 
     return project_leaders
 
+
 def get_log_data(project_id):
     data = []
-    cmd = "SELECT * FROM project_log_table where project_id='%s'" %project_id
+    cmd = "SELECT * FROM project_log_table where project_id='%s'" % project_id
 
     db = DBConn()
     results = db.execute(cmd)
@@ -688,6 +696,7 @@ def get_log_data(project_id):
         data.append(dict(result))
 
     return data
+
 
 if __name__ == '__main__':
     print get_project_files('111', '111')
