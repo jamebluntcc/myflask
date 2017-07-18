@@ -4,7 +4,7 @@ import random
 import os
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
-fontType = os.path.join(os.path.dirname(__file__),'FZZCHJW.TTF')
+fontType = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'FZZCHJW.TTF')
 
 
 def create_validate_code(size=(120, 30),
