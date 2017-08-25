@@ -10,7 +10,7 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 from db import DBConn
-from werkzeug.security import generate_password_hash, check_password_hash
+# from werkzeug.security import generate_password_hash, check_password_hash
 
 '''
 table1_map = {
@@ -274,7 +274,7 @@ def get_user_role(username, password=''):
     result = db.execute(cmd, get_all=False)
     password_hash = result[2] if result else ''
     if password:
-        if check_password_hash(password_hash, password):
+        if password_hash == password:
             role = result[0] if result else ''
             status = result[1] if result else ''
             return role, status
@@ -317,9 +317,9 @@ def change_password(info):
     db = DBConn()
     cmd = "select password from user_info where username='%s'" % username
     result = db.execute(cmd, get_all=False)
-    if result and check_password_hash(result[0], info['old_passwd']) and info['new_passwd'] != info['old_passwd']:
-        password_hash = generate_password_hash(info['new_passwd'])
-        db.update('user_info', {'username': username}, {'password': password_hash,
+    if result and result[0] == info['old_passwd'] and info['new_passwd'] != info['old_passwd']:
+        # password_hash = generate_password_hash(info['new_passwd'])
+        db.update('user_info', {'username': username}, {'password': info['new_passwd'],
                                                         'update_time': datetime.datetime.now()})
 
         return {'data': '', 'errcode': 0, 'msg': '更新成功！'}
@@ -336,8 +336,8 @@ def save_user_info(info):
     info['create_time'] = time
     info['update_time'] = time
     info['status'] = 'R'  # 'R' means review
-    if len(info['password']) < 10:
-        return {'data': '', 'errcode': 3, 'msg': "密码设置过短，请设置为10位以上！"}
+    if len(info['password']) < 5:
+        return {'data': '', 'errcode': 3, 'msg': "密码设置过短，请设置为5位以上！"}
     db = DBConn()
     name_result = db.execute("select id, status from user_info where username='%s'" % info.get('username'), get_all=False)
     tel_result = db.execute("select id, status from user_info where tel='%s'" % info.get('tel'), get_all=False)
@@ -358,7 +358,7 @@ def save_user_info(info):
     elif tel_result:
         ret = fail_info(tel_result, '电话号码')
     else:
-        info['password'] = generate_password_hash(info.get('password'))
+        # info['password'] = generate_password_hash(info.get('password'))
         db.insert('user_info', info)
         ret = {'data': '', 'errcode': 0, 'msg': '注册成功：等待审核！'}
 

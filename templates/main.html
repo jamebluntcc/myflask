@@ -59,6 +59,10 @@
                             <!--<li><a onclick="$('#page_detail').render('/get_sample_page');">新建样品信息表</a></li>-->
                         {% elif role=='manager' %}
                             <li>
+                            <!--<a onclick="$('#page_detail').render('/get_input_info')">新建项目</a>-->
+                                <a onclick="$('#page_detail').render('/get_user_read')">新建项目</a>
+                            </li>
+                            <li>
                                 <a href="#" onclick="$('#selected_project_div').show();$('#selected_project')[0].selectedIndex=0;$('#detail').empty();" >查看项目分析数据</a>
                             </li>
                             <li>
