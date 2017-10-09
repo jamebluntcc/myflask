@@ -165,10 +165,10 @@ def save_sample_project_master_info(db_instance, data_info, username, action):
     else:
         cmd = "select max(project_number) from sample_project_master"
         result = db_instance.execute(cmd, get_all=False)
-        if result:
+        if result[0]:
             name_list = result[0].split('-')
         else:
-            name_list = ['ONMATH', '001']
+            name_list = ['ONMATH', '0']
         new_project_num = name_list[0] + '-' + str(int(name_list[1]) + 1)
         data_info['project_number'] = new_project_num
         data_info['created_by'] = username
