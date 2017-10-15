@@ -169,7 +169,14 @@ def save_sample_project_master_info(db_instance, data_info, username, action):
             name_list = result[0].split('-')
         else:
             name_list = ['ONMATH', '0']
-        new_project_num = name_list[0] + '-' + str(int(name_list[1]) + 1)
+	name_list[1] = int(name_list[1]) + 1
+	if name_list[1] < 10:
+	    name_list[1] = '00' + str(name_list[1])
+	elif name_list[1] >= 100:
+	    name_list[1] = str(name_list[1])
+	else:
+	    name_list[1] = '0' + str(name_list[1])
+        new_project_num = name_list[0] + '-' + name_list[1]
         data_info['project_number'] = new_project_num
         data_info['created_by'] = username
         data_info['create_time'] = datetime.datetime.now()
